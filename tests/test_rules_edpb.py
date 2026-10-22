@@ -41,11 +41,36 @@ EDPB_CASES = [
     ("11", "Stolen material storing non-encrypted personal data",
      BreachFacts("simple", (("identity data enabling identity fraud", 1), ("very large number of subjects", 1)),
                  "maximum", confidentiality="unknown_recipients", malicious=True), False, (True, True)),
+    ("07", "Credential stuffing attack on a banking website",
+     # about 100 000 customers' identifying data exposed, about 2 000 accounts logged into
+     BreachFacts("financial", (), "maximum", confidentiality="unknown_recipients", malicious=True), False,
+     (True, True)),
+    ("08", "Exfiltration of business data by a former employee",
+     # basic client contact data; intentions of the former employee unknown, further misuse cannot be ruled out
+     BreachFacts("simple", (), "maximum", confidentiality="unknown_recipients", malicious=True), False,
+     (True, False)),
+    ("12", "Stolen paper files with sensitive data",
+     # paper log book of a rehabilitation facility: identity and health data, no backup
+     BreachFacts("sensitive", (), "maximum", confidentiality="unknown_recipients", availability="permanent",
+                 malicious=True), False, (True, True)),
+    ("13", "Postal mail mistake",
+     # two customers received each other's order and bill; EDPB: risk low, Art. 34 not mandated
+     BreachFacts("simple", (), "maximum", confidentiality="known_recipients"), False, (False, False)),
     ("14", "Highly confidential personal data sent by mail by mistake",
      BreachFacts("financial", (), "maximum", confidentiality="unknown_recipients"), False, (True, True)),
     ("15", "Personal data sent by mail by mistake",
      BreachFacts("simple", (), "maximum", confidentiality="known_recipients"), False, (False, False)),
+    ("17", "Identity theft",
+     # impostor passed weak caller verification and changed the billing e-mail address; reversed later
+     BreachFacts("financial", (), "maximum", confidentiality="unknown_recipients", integrity="altered_recoverable",
+                 malicious=True), False, (True, True)),
+    ("18", "Email exfiltration",
+     # salary data of employees exfiltrated through a compromised mailbox; EDPB: high risk
+     BreachFacts("financial", (), "maximum", confidentiality="unknown_recipients", malicious=True), False,
+     (True, True)),
 ]
+# Case 16 (insurance letter in the wrong envelope) is not encoded: its conclusion table did not
+# survive text extraction and the narrative gives no explicit Art. 33/34 conclusion.
 
 
 @pytest.mark.parametrize("cid,title,facts,unint,expected", EDPB_CASES, ids=[c[0] for c in EDPB_CASES])

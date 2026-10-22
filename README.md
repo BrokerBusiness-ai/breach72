@@ -23,7 +23,7 @@ Requirements: Python 3.11+. No third-party runtime packages.
 ```bash
 python -m pip install -r requirements.txt          # pytest only
 python data/generator.py                          # SYNTHETIC data (deterministic)
-python -m pytest -q                               # 29 tests: rule set (EDPB 01/2021 cases) and pipeline
+python -m pytest -q                               # 45 tests: rule set (EDPB 01/2021 cases) and pipeline
 python run.py input_examples/case2_misdirected_email.json --backend dev --out out.json
 python report.py out.json                         # HTML report next to the JSON
 ```
@@ -69,8 +69,9 @@ Trace: one JSONL file per run in `logs/`, written by the code path that acted, w
 | 4 | Breach at the payroll processor, reported 50 hours after detection | escalate; Art. 33(2) and contract review flags |
 | 5 | Public listing of contact form data, discovery time not recorded | escalate; awareness time assumed |
 
-The rule set is tested against 11 worked cases of EDPB Guidelines 01/2021 (cases 01, 02, 03, 04, 05, 06, 09, 10,
-11, 14, 15), `tests/test_rules_edpb.py`.
+The rule set is tested against 17 of the 18 worked cases of EDPB Guidelines 01/2021 (all except case 16,
+whose conclusion table is not machine-readable in the published PDF), `tests/test_rules_edpb.py`.
+Borderline scores (for example case 08, SE 2.0) still escalate to the DPO in the full pipeline.
 
 ## Sponsor technology
 

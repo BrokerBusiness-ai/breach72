@@ -12,3 +12,7 @@ venv/
 logs/*.jsonl
 !logs/.gitkeep
 data/synthetic/*.sqlite
+
+# Meterless runtime state
+logs/.world/
+memory/

@@ -5,12 +5,16 @@
   are re-verified at the source with a DIFFERENT template.
 - Disagreement between sources opens a "conflict" branch: the conservative value
   is kept for the provisional decision and the case is escalated to the DPO.
-- (Block B10) facts recalled from organisational memory are re-verified the same way.
+- Facts recalled from organisational memory (Meterless H-MEM) are re-verified at
+  the source with the template that produced them; the outcome is fed back to
+  H-MEM (helpful + promotion, or wrong + a superseding record).
 
 Nemotron (large model) may add a short written assessment of a conflict; it
 cannot change a status.
 """
 from __future__ import annotations
+
+import json
 
 from app.agents.investigator import evidence_of
 from app.orchestration.state import CaseState, Finding
@@ -119,3 +123,43 @@ class EvidenceAuditor:
             f.value["recipient"] = "identified"
         f.status, f.confidence = "verified", "high" if res else "single_source"
         f.verified_by = "T02_INCIDENT_UPDATES" if res else None
+
+    # ---- organisational memory (H-MEM) ----------------------------------
+    def reverify_memory(self, state: CaseState, recalled: list[dict], hmem) -> list[dict]:
+        from app.orchestration.org_memory import describe, rows_hash
+        outcomes = []
+        for m in recalled:
+            template_id, params_json, expected, _ = m["provenance"]["refs"]
+            res = self.inv.q(state, template_id, json.loads(params_json))
+            if res is None:
+                outcomes.append({"memory": m["id"], "outcome": "source_unavailable"})
+                continue
+            actual = rows_hash(res.rows)
+            ev = evidence_of(res, f"rows_hash={actual}")
+            if actual == expected:
+                hmem.retrieval.feedback(m["id"], "helpful")
+                hmem.store.promote(m["id"], "long_term")
+                outcome, note, new_id = "confirmed", "", None
+            else:
+                hmem.retrieval.feedback(m["id"], "wrong")
+                new = hmem.store.add(describe(template_id, res.params, res.rows),
+                                     source=f"breach72:{state.run_id}:reverify", type_="factual",
+                                     tags=[t for t in m["tags"] if t != "review"], supersedes=m["id"],
+                                     provenance={"origin": "user_correction", "learnedAt": hmem.store.clock(),
+                                                 "label": f"{state.run_id}/reverify",
+                                                 "refs": [template_id, params_json, actual, res.backend]})
+                hmem.store.update(m["id"], {"supersededBy": new["id"]}, action="conflict_resolved",
+                                  details={"reason": "source differs from memory", "replacement": new["id"]})
+                outcome, new_id = "outdated", new["id"]
+                note = f"memory {m['id']} was outdated; replaced by {new['id']} from the source"
+            state.add(Finding("", f"org_memory:{m['id']}", f"Recalled from organisational memory ({m['id']}, learned in "
+                              f"{m['provenance']['label']}) and re-checked at the source: {outcome}",
+                              {"memory_id": m["id"], "outcome": outcome, "replacement": new_id,
+                               "template_id": template_id},
+                              [ev], status="verified", verified_by=template_id,
+                              confidence="high" if outcome == "confirmed" else "single_source", note=note),
+                      by=self.name)
+            self.trace.event(self.name, "memory_reverified", {"memory": m["id"], "template_id": template_id,
+                                                              "outcome": outcome, "replacement": new_id})
+            outcomes.append({"memory": m["id"], "outcome": outcome, "replacement": new_id})
+        return outcomes

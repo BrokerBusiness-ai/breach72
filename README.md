@@ -77,8 +77,21 @@ The rule set is tested against 11 worked cases of EDPB Guidelines 01/2021 (cases
 - **Zetaris**: the single governed SQL access point to the four source systems (incident PostgreSQL database,
   ROPA, asset register and processor contracts). The Investigator queries in place through vetted templates; the
   Auditor re-queries with a different template before approval. Responses are recorded for sample mode.
-- **Meterless**: World Model for case entities and the evidence trail; H-MEM for verified organisational facts
-  across cases, with a provenance ledger. A recalled fact is always re-verified at the source.
+- **Meterless** (Python implementations of the Apache-2.0 reference architecture, engines `world-model` and
+  `hmem`, commit `1742dec`; Markovian and Scout are not used):
+  - *World Model* (`app/adapters/meterless_world.py`) is the shared case state. Every finding and every status
+    change by the Evidence Auditor is an `assertFact` on the incident entity with provenance (agent, template,
+    query hash); "no provenance, no write"; most-recent-wins keeps superseded versions in the append-only event
+    log (`logs/.world/<run_id>.json`). Agents read the current finding for a claim through it, and the Reviewer's
+    model prompt is built by `ContextBuilder` from the current facts.
+  - *H-MEM* (`app/adapters/meterless_hmem.py`, `app/orchestration/org_memory.py`) keeps verified facts about the
+    organisation's registers (ROPA, asset security, processor contracts) across cases, with the canonical hybrid
+    retrieval score, feedback deltas and an append-only `ledger.jsonl` (`memory/<organisation>/`). At the start of
+    a case the facts for the affected system are recalled; the Evidence Auditor re-runs the source template for
+    each one: a match gives `helpful` feedback and promotion to `long_term`, a mismatch gives `wrong` feedback and a
+    superseding record taken from the source. Memory never feeds the rule directly. Try it: run case 2 and then
+    case 2b; the second run recalls two facts and re-verifies them (`org_memory` in the output, trace events
+    `recall` and `memory_reverified`).
 - **NVIDIA Nemotron** (hosted NVIDIA API): see below.
 - **Cursor**: development workspace; project rules in `.cursor/rules/breach72.mdc`.
 
@@ -96,8 +109,9 @@ The rule set is tested against 11 worked cases of EDPB Guidelines 01/2021 (cases
 ## Status (22 October 2026)
 
 Done: five agents, rule set with tests, five synthetic cases, trace, HTML report, Zetaris adapter with timeout
-(20 s), bounded retries, recording and replay. In progress before the deadline: live Zetaris sources and recordings,
-Meterless World Model and H-MEM adapters, live Nemotron calls.
+(20 s), bounded retries, recording and replay, Meterless World Model (shared case state) and H-MEM (organisational
+memory with re-verification). In progress before the deadline: live Zetaris sources and recordings, live Nemotron
+calls.
 
 ## Pre-window declaration
 
@@ -108,7 +122,9 @@ tools installed.
 ## Third-Party Code and Licences
 
 - Python standard library; `pytest` (MIT) for tests.
-- Meterless reference architectures (Apache-2.0), used as design references.
+- Meterless reference architectures (Apache-2.0, github.com/Meterless/Meterless, commit 1742dec): the World Model
+  and H-MEM modules are Python ports of the TypeScript reference (id grammar, event fold, retrieval formula,
+  feedback deltas, ledger); file headers name the source files.
 - Zetaris local platform, used as a service under its own terms; not redistributed here.
 - Public legal texts: GDPR; EDPB Guidelines 01/2021 and 9/2022; ENISA (2013) severity methodology.
 

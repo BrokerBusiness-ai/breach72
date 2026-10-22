@@ -114,7 +114,11 @@ class ReviewerDrafter:
 
     def _summary(self, state, path, sev, expl) -> str | None:
         ids = {x.id for x in state.findings}
-        facts = "\n".join(f"{x.id} [{x.status}]: {x.statement}" for x in state.findings if x.status != "vetoed")
+        if state.world is not None:   # Meterless ContextBuilder: current facts with provenance
+            from app.adapters.meterless_world import ContextBuilder
+            facts = ContextBuilder(state.world).build(state.incident_entity)["text"]
+        else:
+            facts = "\n".join(f"{x.id} [{x.status}]: {x.statement}" for x in state.findings if x.status != "vetoed")
         text = self.llm.chat(self.name, "large",
                              "You explain a decision that has ALREADY been made by a deterministic GDPR rule. "
                              "Write 3-5 sentences for a data protection officer. Cite finding ids like [F03] for "

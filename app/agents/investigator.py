@@ -22,6 +22,7 @@ class Investigator:
 
     def __init__(self, backend, trace):
         self.backend, self.trace = backend, trace
+        self.results: dict[str, QueryResult] = {}   # query_hash -> result (read by organisational memory)
 
     def q(self, state: CaseState, template_id: str, params: dict) -> QueryResult | None:
         try:
@@ -32,6 +33,7 @@ class Investigator:
             self.trace.event(self.name, "query_failed", {"template_id": template_id, "params": params,
                                                          "error": str(exc), "recoverable": exc.recoverable})
             return None
+        self.results[res.query_hash] = res
         self.trace.event(self.name, "query", {"template_id": template_id, "params": params, "backend": res.backend,
                                               "query_hash": res.query_hash, "rows": len(res.rows),
                                               "elapsed_ms": res.elapsed_ms, "recorded_at": res.recorded_at})

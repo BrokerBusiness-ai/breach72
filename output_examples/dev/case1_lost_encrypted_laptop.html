@@ -1,0 +1,34 @@
+<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content='width=device-width'><title>Breach72 INC-2026-001</title><style>
+body{font:15px/1.5 system-ui,Segoe UI,Arial,sans-serif;margin:0;background:#f6f7f9;color:#1d2433}
+main{max-width:980px;margin:0 auto;padding:24px 16px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 8px}
+.card{background:#fff;border:1px solid #dde2ea;border-radius:8px;padding:16px;margin:12px 0}
+.decision{font-size:20px;font-weight:700}.esc{color:#a4430f}.ok{color:#1d6b3a}
+.pill{display:inline-block;border-radius:12px;padding:2px 10px;font-size:13px;background:#eef1f6;margin:2px 4px 2px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{border-bottom:1px solid #e6e9ef;padding:6px;text-align:left;vertical-align:top}
+.verified{color:#1d6b3a}.conflict{color:#a4430f;font-weight:600}.vetoed{color:#888;text-decoration:line-through}
+code{background:#eef1f6;padding:1px 4px;border-radius:4px;font-size:13px}.muted{color:#5b6576;font-size:13px}
+</style><main>
+<h1>Breach72: INC-2026-001</h1><div class=muted>Run 20261022T121227-5a5c32, assessed as of 2026-10-19T12:00:00+02:00. Data backends: dev-sqlite. SYNTHETIC data.</div>
+<div class=card><div class='decision ok'>Document internally only (no notification)</div><div>Provisional rule outcome: <code>document_internally</code>. Severity 1.0 (low, ENISA 2013).</div>
+<div>72-hour clock: aware at 2026-10-19T08:30:00+02:00, deadline 2026-10-22T08:30:00+02:00, hours left 68.5.</div>
+</div>
+<h2>Why</h2><div class=card><ol><li>Severity 1.0 (low) = DPC 2 x EI 0.25 + CB 0.5 (ENISA 2013) [F02][F03][F04].</li><li>Rule step: DPC base 2 for behavioural data.</li><li>Rule step: EI negligible: data unintelligible to the recipient (encryption/hashing, key safe).</li><li>Rule step: EI 0.25 (negligible ease of identification).</li><li>Rule step: CB +0.5 for confidentiality (unknown_recipients).</li><li>GDPR Art. 33(1): breach unlikely to result in a risk (severity low).</li><li>GDPR Art. 33(5): every breach is documented internally.</li></ol></div>
+<h2>Findings and evidence</h2><div class=card><table><tr><th>Id</th><th>Claim</th><th>Status</th><th>Evidence</th></tr>
+<tr><td>F01</td><td>Moment the controller became aware of the breach</td><td class=verified>verified<div class=muted>single_source</div></td><td><code>T01_INCIDENT_CORE</code> dev-sqlite incidents rows INC-2026-001</td></tr>
+<tr><td>F02</td><td>Data categories in PR-01: email, name, work_documents</td><td class=verified>verified<div class=muted>single_source</div></td><td><code>T05_ROPA_FOR_SYSTEM</code> dev-sqlite ropa rows PR-01</td></tr>
+<tr><td>F03</td><td>Encryption at rest: full_disk_aes256, key: separate_tpm_pin (unintelligible to a finder)</td><td class=verified>verified<div class=muted>single_source</div></td><td><code>T06_ASSET_SECURITY</code> dev-sqlite assets rows SYS-LAPTOP-114<br><code>T06_ASSET_SECURITY</code> dev-sqlite assets rows SYS-LAPTOP-114</td></tr>
+<tr><td>F04</td><td>Loss of control: device lost outside the premises</td><td class=verified>verified<div class=muted>high via T02_INCIDENT_UPDATES</div></td><td><code>T01_INCIDENT_CORE</code> dev-sqlite incidents rows INC-2026-001<br><code>T02_INCIDENT_UPDATES</code> dev-sqlite incident_updates rows UPD-001</td></tr>
+<tr><td>F05</td><td>Up to 40 data subjects (ROPA estimate; no record count in the logs)<div class=muted>upper bound; estimate from ROPA, not a count</div></td><td class=verified>verified<div class=muted>single_source</div></td><td><code>T05_ROPA_FOR_SYSTEM</code> dev-sqlite ropa rows PR-01</td></tr>
+<tr><td>F06</td><td>Backup: daily, offline copy: yes -&gt; availability impact &#x27;none&#x27;</td><td class=verified>verified<div class=muted>single_source</div></td><td><code>T06_ASSET_SECURITY</code> dev-sqlite assets rows SYS-LAPTOP-114</td></tr>
+<tr><td>F07</td><td>Updates recorded up to the assessment time: REMOTE_WIPE_SENT</td><td class=verified>verified<div class=muted>single_source</div></td><td><code>T02_INCIDENT_UPDATES</code> dev-sqlite incident_updates rows UPD-001</td></tr>
+</table></div>
+<h2>Draft notification to the supervisory authority (Art. 33(3))</h2><div class=card><table>
+<tr><th>a_nature</th><td>lost device: Employee reports laptop left on a train. Categories: email, name, work_documents. Approximately 40 data subjects and records (ropa estimate).</td></tr>
+<tr><th>b_contact</th><td>Data Protection Officer, iod@przykladowo.example (SYNTHETIC)</td></tr>
+<tr><th>c_consequences</th><td>Likely consequences: phishing targeting the data subjects.</td></tr>
+<tr><th>d_measures</th><td>Measures taken: remote wipe of the device initiated. Proposed: confirm remote wipe; rotate credentials stored on the device.</td></tr>
+</table>
+</div>
+<h2>Limitations</h2><div class=card><ul><li>Decision support for a data protection officer, not legal advice.</li><li>All data is synthetic (see data/SYNTHETIC.md).</li><li>Severity follows the ENISA 2013 method; national supervisory authority practice may differ.</li><li>Evidence came from the local dev backend, not from Zetaris.</li></ul><div class=muted>Trace: logs/trace-20261022T121227-5a5c32.jsonl. Agents: planner, investigator, evidence_auditor, risk_assessor, reviewer_drafter. Iterations: 1. Execution time: 0.03 s.</div></div>
+</main></html>

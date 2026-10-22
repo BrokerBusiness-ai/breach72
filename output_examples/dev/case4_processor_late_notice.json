@@ -1,0 +1,386 @@
+{
+  "run_id": "20261022T121228-ccfd92",
+  "status": "ok",
+  "incident_id": "INC-2026-004",
+  "as_of": "2026-10-21T18:00:00+02:00",
+  "decision": "escalate_to_dpo",
+  "decision_text": "Escalate to the DPO for a human decision",
+  "provisional_decision": "notify_authority_and_individuals",
+  "notify_supervisory_authority": true,
+  "notify_data_subjects": true,
+  "escalation_reasons": [
+    "severity score 4.0 is near a band threshold"
+  ],
+  "flags": [
+    "processor_breach",
+    "processor_contract_breach_review"
+  ],
+  "risk": {
+    "score": 4.0,
+    "band": "very_high",
+    "components": {
+      "dpc": 3,
+      "ei_level": "maximum",
+      "ei": 1.0,
+      "confidentiality": 0.5,
+      "integrity": 0.0,
+      "availability": 0.0,
+      "malicious": 0.5
+    },
+    "method": "ENISA 2013",
+    "rule_inputs": {
+      "data_type": "financial",
+      "dpc_adjustments": [],
+      "identifiability": "maximum",
+      "unintelligible": false,
+      "confidentiality": "unknown_recipients",
+      "integrity": "none",
+      "availability": "none",
+      "malicious": true,
+      "mitigations": []
+    }
+  },
+  "explanation": [
+    "Severity 4.0 (very_high) = DPC 3 x EI 1.0 + CB 1.0 (ENISA 2013) [F02][F05][F03].",
+    "Rule step: DPC base 3 for financial data.",
+    "Rule step: EI 1.0 (maximum ease of identification).",
+    "Rule step: CB +0.5 for confidentiality (unknown_recipients).",
+    "Rule step: CB +0.5 for malicious (malicious intent).",
+    "Rule step: Score 4.0 is within 0.25 of a band threshold: human review required.",
+    "GDPR Art. 33(1): risk to rights and freedoms (severity very_high).",
+    "GDPR Art. 34(1): likely high risk (severity very_high).",
+    "GDPR Art. 33(5): every breach is documented internally.",
+    "GDPR Art. 33(2): processor must notify controller without undue delay.",
+    "GDPR Art. 28(3)(f): processor informed after 50 h, contract allows 24 h: review contract.",
+    "Escalated to the DPO because: severity score 4.0 is near a band threshold."
+  ],
+  "model_summary": null,
+  "findings": [
+    {
+      "id": "F01",
+      "claim": "aware_at",
+      "statement": "Moment the controller became aware of the breach",
+      "value": {
+        "aware_at": "2026-10-21T15:00:00+02:00",
+        "assumed": false
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T01_INCIDENT_CORE",
+          "tables": [
+            "incidents"
+          ],
+          "row_ref": "INC-2026-004",
+          "query_hash": "5a7a89f8573dc09b6779",
+          "executed_at": "2026-10-22T10:12:28+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F02",
+      "claim": "data_categories",
+      "statement": "Data categories in PR-04: bank_account, name, pesel, salary",
+      "value": {
+        "categories": [
+          "bank_account",
+          "name",
+          "pesel",
+          "salary"
+        ],
+        "special": false,
+        "processing_ids": [
+          "PR-04"
+        ],
+        "processor_ids": [
+          "PROC-01"
+        ],
+        "subjects_estimate": 310
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T05_ROPA_FOR_SYSTEM",
+          "tables": [
+            "ropa"
+          ],
+          "row_ref": "PR-04",
+          "query_hash": "8edc20fd86d42e242566",
+          "executed_at": "2026-10-22T10:12:28+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F03",
+      "claim": "disclosure",
+      "statement": "Loss of control: unauthorised access reported by the processor",
+      "value": {
+        "left_control": true,
+        "recipient": "unknown",
+        "destinations": [],
+        "actions": []
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T01_INCIDENT_CORE",
+          "tables": [
+            "incidents"
+          ],
+          "row_ref": "INC-2026-004",
+          "query_hash": "5a7a89f8573dc09b6779",
+          "executed_at": "2026-10-22T10:12:28+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T02_INCIDENT_UPDATES",
+          "tables": [
+            "incident_updates"
+          ],
+          "row_ref": "UPD-007,UPD-006",
+          "query_hash": "4f95c6f8782976d91ac1",
+          "executed_at": "2026-10-22T10:12:28+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": "T02_INCIDENT_UPDATES",
+      "confidence": "high",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F04",
+      "claim": "affected_count",
+      "statement": "Up to 310 data subjects (ROPA estimate; no record count in the logs)",
+      "value": {
+        "subjects": 310,
+        "basis": "ropa_estimate"
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T05_ROPA_FOR_SYSTEM",
+          "tables": [
+            "ropa"
+          ],
+          "row_ref": "PR-04",
+          "query_hash": "8edc20fd86d42e242566",
+          "executed_at": "2026-10-22T10:12:28+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": "upper bound; estimate from ROPA, not a count"
+    },
+    {
+      "id": "F05",
+      "claim": "data_unintelligible",
+      "statement": "Encryption at rest: provider_managed, key: provider (readable if accessed)",
+      "value": {
+        "unintelligible": false,
+        "basis": "asset_register"
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T06_ASSET_SECURITY",
+          "tables": [
+            "assets"
+          ],
+          "row_ref": "SYS-PAYROLL-EXT",
+          "query_hash": "b0a476902e5fe64f13c7",
+          "executed_at": "2026-10-22T10:12:28+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T06_ASSET_SECURITY",
+          "tables": [
+            "assets"
+          ],
+          "row_ref": "SYS-PAYROLL-EXT",
+          "query_hash": "b0a476902e5fe64f13c7",
+          "executed_at": "2026-10-22T10:12:28+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F06",
+      "claim": "processor",
+      "statement": "Processor Przykladowo Payroll Services (fictional) (UP-2024-011), Art. 28 contract: yes, notice within 24 h",
+      "value": {
+        "processor_id": "PROC-01",
+        "notice_hours": 24,
+        "detected_at": "2026-10-19T13:00:00+02:00"
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T07_PROCESSOR_CONTRACT",
+          "tables": [
+            "processor_contracts"
+          ],
+          "row_ref": "PROC-01",
+          "query_hash": "20b50817be6ad73f54ff",
+          "executed_at": "2026-10-22T10:12:28+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T02_INCIDENT_UPDATES",
+          "tables": [
+            "incident_updates"
+          ],
+          "row_ref": "PROCESSOR_DETECTED",
+          "query_hash": "4f95c6f8782976d91ac1",
+          "executed_at": "2026-10-22T10:12:28+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F07",
+      "claim": "mitigations",
+      "statement": "Updates recorded up to the assessment time: PROCESSOR_DETECTED, PROCESSOR_NOTICE",
+      "value": {
+        "codes": [
+          "PROCESSOR_DETECTED",
+          "PROCESSOR_NOTICE"
+        ],
+        "updates": [
+          {
+            "update_id": "UPD-007",
+            "ts": "2026-10-19T13:00:00+02:00",
+            "source": "processor",
+            "code": "PROCESSOR_DETECTED",
+            "detail": "Detection time at the processor, as stated in the processor notice."
+          },
+          {
+            "update_id": "UPD-006",
+            "ts": "2026-10-21T15:00:00+02:00",
+            "source": "processor",
+            "code": "PROCESSOR_NOTICE",
+            "detail": "Processor states it detected the breach on its side 50 hours earlier."
+          }
+        ]
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T02_INCIDENT_UPDATES",
+          "tables": [
+            "incident_updates"
+          ],
+          "row_ref": "UPD-007,UPD-006",
+          "query_hash": "4f95c6f8782976d91ac1",
+          "executed_at": "2026-10-22T10:12:28+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": false,
+      "note": ""
+    }
+  ],
+  "legal_basis": [
+    {
+      "article": "GDPR Art. 33(1)",
+      "why": "risk to rights and freedoms (severity very_high)"
+    },
+    {
+      "article": "GDPR Art. 34(1)",
+      "why": "likely high risk (severity very_high)"
+    },
+    {
+      "article": "GDPR Art. 33(5)",
+      "why": "every breach is documented internally"
+    },
+    {
+      "article": "GDPR Art. 33(2)",
+      "why": "processor must notify controller without undue delay"
+    },
+    {
+      "article": "GDPR Art. 28(3)(f)",
+      "why": "processor informed after 50 h, contract allows 24 h: review contract"
+    }
+  ],
+  "draft_notification": {
+    "to_supervisory_authority": {
+      "a_nature": "processor breach: Payroll processor reports unauthorised access at its side. Categories: bank_account, name, pesel, salary. Approximately 310 data subjects and records (ropa estimate).",
+      "b_contact": "Data Protection Officer, iod@przykladowo.example (SYNTHETIC)",
+      "c_consequences": "Likely consequences: disclosure of financial situation; financial fraud; identity fraud using the national identification number.",
+      "d_measures": "Measures taken: processor notice received. Proposed: obtain the processor's full incident report; review the Art. 28 contract."
+    },
+    "missing": [],
+    "complete": true,
+    "to_data_subjects": {
+      "a_nature": "processor breach: Payroll processor reports unauthorised access at its side. Categories: bank_account, name, pesel, salary. Approximately 310 data subjects and records (ropa estimate).",
+      "b_contact": "Data Protection Officer, iod@przykladowo.example (SYNTHETIC)",
+      "c_consequences": "Likely consequences: disclosure of financial situation; financial fraud; identity fraud using the national identification number.",
+      "d_measures": "Measures taken: processor notice received. Proposed: obtain the processor's full incident report; review the Art. 28 contract.",
+      "language": "clear and plain language (Art. 34(2))"
+    }
+  },
+  "open_questions": [],
+  "clock": {
+    "aware_at": "2026-10-21T15:00:00+02:00",
+    "assumed": false,
+    "deadline": "2026-10-24T15:00:00+02:00",
+    "now": "2026-10-21T18:00:00+02:00",
+    "hours_left": 69.0,
+    "processor_lag_hours": 50.0
+  },
+  "limitations": [
+    "Decision support for a data protection officer, not legal advice.",
+    "All data is synthetic (see data/SYNTHETIC.md).",
+    "Severity follows the ENISA 2013 method; national supervisory authority practice may differ.",
+    "Evidence came from the local dev backend, not from Zetaris."
+  ],
+  "data_backends": [
+    "dev-sqlite"
+  ],
+  "agents": [
+    "planner",
+    "investigator",
+    "evidence_auditor",
+    "risk_assessor",
+    "reviewer_drafter"
+  ],
+  "iterations": 1,
+  "vetoes": [],
+  "errors": [],
+  "llm_enabled": false,
+  "trace_id": "20261022T121228-ccfd92",
+  "log_file": "logs/trace-20261022T121228-ccfd92.jsonl",
+  "execution_time": 0.04
+}

@@ -1,0 +1,35 @@
+<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content='width=device-width'><title>Breach72 INC-2026-004</title><style>
+body{font:15px/1.5 system-ui,Segoe UI,Arial,sans-serif;margin:0;background:#f6f7f9;color:#1d2433}
+main{max-width:980px;margin:0 auto;padding:24px 16px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 8px}
+.card{background:#fff;border:1px solid #dde2ea;border-radius:8px;padding:16px;margin:12px 0}
+.decision{font-size:20px;font-weight:700}.esc{color:#a4430f}.ok{color:#1d6b3a}
+.pill{display:inline-block;border-radius:12px;padding:2px 10px;font-size:13px;background:#eef1f6;margin:2px 4px 2px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{border-bottom:1px solid #e6e9ef;padding:6px;text-align:left;vertical-align:top}
+.verified{color:#1d6b3a}.conflict{color:#a4430f;font-weight:600}.vetoed{color:#888;text-decoration:line-through}
+code{background:#eef1f6;padding:1px 4px;border-radius:4px;font-size:13px}.muted{color:#5b6576;font-size:13px}
+</style><main>
+<h1>Breach72: INC-2026-004</h1><div class=muted>Run 20261022T121228-ccfd92, assessed as of 2026-10-21T18:00:00+02:00. Data backends: dev-sqlite. SYNTHETIC data.</div>
+<div class=card><div class='decision esc'>Escalate to the DPO for a human decision</div><div>Provisional rule outcome: <code>notify_authority_and_individuals</code>. Severity 4.0 (very_high, ENISA 2013).</div>
+<div class=esc>Escalation: severity score 4.0 is near a band threshold</div>
+<div>72-hour clock: aware at 2026-10-21T15:00:00+02:00, deadline 2026-10-24T15:00:00+02:00, hours left 69.0.</div>
+<span class=pill>processor_breach</span><span class=pill>processor_contract_breach_review</span></div>
+<h2>Why</h2><div class=card><ol><li>Severity 4.0 (very_high) = DPC 3 x EI 1.0 + CB 1.0 (ENISA 2013) [F02][F05][F03].</li><li>Rule step: DPC base 3 for financial data.</li><li>Rule step: EI 1.0 (maximum ease of identification).</li><li>Rule step: CB +0.5 for confidentiality (unknown_recipients).</li><li>Rule step: CB +0.5 for malicious (malicious intent).</li><li>Rule step: Score 4.0 is within 0.25 of a band threshold: human review required.</li><li>GDPR Art. 33(1): risk to rights and freedoms (severity very_high).</li><li>GDPR Art. 34(1): likely high risk (severity very_high).</li><li>GDPR Art. 33(5): every breach is documented internally.</li><li>GDPR Art. 33(2): processor must notify controller without undue delay.</li><li>GDPR Art. 28(3)(f): processor informed after 50 h, contract allows 24 h: review contract.</li><li>Escalated to the DPO because: severity score 4.0 is near a band threshold.</li></ol></div>
+<h2>Findings and evidence</h2><div class=card><table><tr><th>Id</th><th>Claim</th><th>Status</th><th>Evidence</th></tr>
+<tr><td>F01</td><td>Moment the controller became aware of the breach</td><td class=verified>verified<div class=muted>single_source</div></td><td><code>T01_INCIDENT_CORE</code> dev-sqlite incidents rows INC-2026-004</td></tr>
+<tr><td>F02</td><td>Data categories in PR-04: bank_account, name, pesel, salary</td><td class=verified>verified<div class=muted>single_source</div></td><td><code>T05_ROPA_FOR_SYSTEM</code> dev-sqlite ropa rows PR-04</td></tr>
+<tr><td>F03</td><td>Loss of control: unauthorised access reported by the processor</td><td class=verified>verified<div class=muted>high via T02_INCIDENT_UPDATES</div></td><td><code>T01_INCIDENT_CORE</code> dev-sqlite incidents rows INC-2026-004<br><code>T02_INCIDENT_UPDATES</code> dev-sqlite incident_updates rows UPD-007,UPD-006</td></tr>
+<tr><td>F04</td><td>Up to 310 data subjects (ROPA estimate; no record count in the logs)<div class=muted>upper bound; estimate from ROPA, not a count</div></td><td class=verified>verified<div class=muted>single_source</div></td><td><code>T05_ROPA_FOR_SYSTEM</code> dev-sqlite ropa rows PR-04</td></tr>
+<tr><td>F05</td><td>Encryption at rest: provider_managed, key: provider (readable if accessed)</td><td class=verified>verified<div class=muted>single_source</div></td><td><code>T06_ASSET_SECURITY</code> dev-sqlite assets rows SYS-PAYROLL-EXT<br><code>T06_ASSET_SECURITY</code> dev-sqlite assets rows SYS-PAYROLL-EXT</td></tr>
+<tr><td>F06</td><td>Processor Przykladowo Payroll Services (fictional) (UP-2024-011), Art. 28 contract: yes, notice within 24 h</td><td class=verified>verified<div class=muted>single_source</div></td><td><code>T07_PROCESSOR_CONTRACT</code> dev-sqlite processor_contracts rows PROC-01<br><code>T02_INCIDENT_UPDATES</code> dev-sqlite incident_updates rows PROCESSOR_DETECTED</td></tr>
+<tr><td>F07</td><td>Updates recorded up to the assessment time: PROCESSOR_DETECTED, PROCESSOR_NOTICE</td><td class=verified>verified<div class=muted>single_source</div></td><td><code>T02_INCIDENT_UPDATES</code> dev-sqlite incident_updates rows UPD-007,UPD-006</td></tr>
+</table></div>
+<h2>Draft notification to the supervisory authority (Art. 33(3))</h2><div class=card><table>
+<tr><th>a_nature</th><td>processor breach: Payroll processor reports unauthorised access at its side. Categories: bank_account, name, pesel, salary. Approximately 310 data subjects and records (ropa estimate).</td></tr>
+<tr><th>b_contact</th><td>Data Protection Officer, iod@przykladowo.example (SYNTHETIC)</td></tr>
+<tr><th>c_consequences</th><td>Likely consequences: disclosure of financial situation; financial fraud; identity fraud using the national identification number.</td></tr>
+<tr><th>d_measures</th><td>Measures taken: processor notice received. Proposed: obtain the processor&#x27;s full incident report; review the Art. 28 contract.</td></tr>
+</table>
+</div>
+<h2>Limitations</h2><div class=card><ul><li>Decision support for a data protection officer, not legal advice.</li><li>All data is synthetic (see data/SYNTHETIC.md).</li><li>Severity follows the ENISA 2013 method; national supervisory authority practice may differ.</li><li>Evidence came from the local dev backend, not from Zetaris.</li></ul><div class=muted>Trace: logs/trace-20261022T121228-ccfd92.jsonl. Agents: planner, investigator, evidence_auditor, risk_assessor, reviewer_drafter. Iterations: 1. Execution time: 0.04 s.</div></div>
+</main></html>

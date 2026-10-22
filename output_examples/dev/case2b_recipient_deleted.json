@@ -1,0 +1,352 @@
+{
+  "run_id": "20261022T121227-a7400c",
+  "status": "ok",
+  "incident_id": "INC-2026-002",
+  "as_of": "2026-10-21T12:00:00+02:00",
+  "decision": "notify_authority",
+  "decision_text": "Notify the supervisory authority",
+  "provisional_decision": "notify_authority",
+  "notify_supervisory_authority": true,
+  "notify_data_subjects": false,
+  "escalation_reasons": [],
+  "flags": [],
+  "risk": {
+    "score": 2.5,
+    "band": "medium",
+    "components": {
+      "dpc": 3,
+      "ei_level": "significant",
+      "ei": 0.75,
+      "confidentiality": 0.25,
+      "integrity": 0.0,
+      "availability": 0.0,
+      "malicious": 0.0
+    },
+    "method": "ENISA 2013",
+    "rule_inputs": {
+      "data_type": "financial",
+      "dpc_adjustments": [],
+      "identifiability": "maximum",
+      "unintelligible": false,
+      "confidentiality": "unknown_recipients",
+      "integrity": "none",
+      "availability": "none",
+      "malicious": false,
+      "mitigations": [
+        "recipient_deletion_confirmed"
+      ]
+    }
+  },
+  "explanation": [
+    "Severity 2.5 (medium) = DPC 3 x EI 0.75 + CB 0.25 (ENISA 2013) [F02][F05][F04].",
+    "Rule step: DPC base 3 for financial data.",
+    "Rule step: EI lowered to significant: recipient confirmed deletion.",
+    "Rule step: Confidentiality: recipient identified and confirmed deletion.",
+    "Rule step: EI 0.75 (significant ease of identification).",
+    "Rule step: CB +0.25 for confidentiality (known_recipients).",
+    "GDPR Art. 33(1): risk to rights and freedoms (severity medium).",
+    "GDPR Art. 33(5): every breach is documented internally."
+  ],
+  "model_summary": null,
+  "findings": [
+    {
+      "id": "F01",
+      "claim": "aware_at",
+      "statement": "Moment the controller became aware of the breach",
+      "value": {
+        "aware_at": "2026-10-20T09:15:00+02:00",
+        "assumed": false
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T01_INCIDENT_CORE",
+          "tables": [
+            "incidents"
+          ],
+          "row_ref": "INC-2026-002",
+          "query_hash": "5b4153b556e7c8032a17",
+          "executed_at": "2026-10-22T10:12:27+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F02",
+      "claim": "data_categories",
+      "statement": "Data categories in PR-07: address, benefit_type, name, pesel",
+      "value": {
+        "categories": [
+          "address",
+          "benefit_type",
+          "name",
+          "pesel"
+        ],
+        "special": false,
+        "processing_ids": [
+          "PR-07"
+        ],
+        "processor_ids": [],
+        "subjects_estimate": 1450,
+        "exported_categories": [
+          "address",
+          "benefit_type",
+          "name",
+          "pesel"
+        ]
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T05_ROPA_FOR_SYSTEM",
+          "tables": [
+            "ropa"
+          ],
+          "row_ref": "PR-07",
+          "query_hash": "adce268a8a24cde808dc",
+          "executed_at": "2026-10-22T10:12:27+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T08_EXPORT_CATEGORIES",
+          "tables": [
+            "export_items"
+          ],
+          "row_ref": "address;benefit_type;name;pesel",
+          "query_hash": "15a6362a32186e31a13b",
+          "executed_at": "2026-10-22T10:12:27+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": "T08_EXPORT_CATEGORIES",
+      "confidence": "high",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F03",
+      "claim": "affected_count",
+      "statement": "1200 records left the system in the logged event(s)",
+      "value": {
+        "subjects": 1200,
+        "basis": "access_log",
+        "distinct_subjects": 1200
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T03_TRANSFER_EVENTS",
+          "tables": [
+            "access_logs"
+          ],
+          "row_ref": "LOG-0003",
+          "query_hash": "a6fc329d0416ff0cb259",
+          "executed_at": "2026-10-22T10:12:27+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T04_EXPORT_ITEMS_COUNT",
+          "tables": [
+            "export_items"
+          ],
+          "row_ref": "count=1200,subjects=1200",
+          "query_hash": "8aa2bb599ad98fd4929c",
+          "executed_at": "2026-10-22T10:12:27+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": "T04_EXPORT_ITEMS_COUNT",
+      "confidence": "high",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F04",
+      "claim": "disclosure",
+      "statement": "Data sent outside the controller: email_send to unknown.recipient@example.net",
+      "value": {
+        "left_control": true,
+        "recipient": "identified",
+        "destinations": [
+          "unknown.recipient@example.net"
+        ],
+        "actions": [
+          "email_send"
+        ],
+        "bytes": 418500
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T03_TRANSFER_EVENTS",
+          "tables": [
+            "access_logs"
+          ],
+          "row_ref": "LOG-0003",
+          "query_hash": "a6fc329d0416ff0cb259",
+          "executed_at": "2026-10-22T10:12:27+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T02_INCIDENT_UPDATES",
+          "tables": [
+            "incident_updates"
+          ],
+          "row_ref": "UPD-002,UPD-003",
+          "query_hash": "dc28412153086580a130",
+          "executed_at": "2026-10-22T10:12:27+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": "T02_INCIDENT_UPDATES",
+      "confidence": "high",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F05",
+      "claim": "data_unintelligible",
+      "statement": "The e-mailed file was NOT encrypted",
+      "value": {
+        "unintelligible": false,
+        "basis": "attachment_encrypted"
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T03_TRANSFER_EVENTS",
+          "tables": [
+            "access_logs"
+          ],
+          "row_ref": "LOG-0003",
+          "query_hash": "a6fc329d0416ff0cb259",
+          "executed_at": "2026-10-22T10:12:27+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T06_ASSET_SECURITY",
+          "tables": [
+            "assets"
+          ],
+          "row_ref": "SYS-SOCIAL-REG",
+          "query_hash": "ab13505a554da38b3b91",
+          "executed_at": "2026-10-22T10:12:27+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": "T06_ASSET_SECURITY",
+      "confidence": "high",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F06",
+      "claim": "mitigations",
+      "statement": "Updates recorded up to the assessment time: RECIPIENT_IDENTIFIED, RECIPIENT_DELETION_CONFIRMED",
+      "value": {
+        "codes": [
+          "RECIPIENT_IDENTIFIED",
+          "RECIPIENT_DELETION_CONFIRMED"
+        ],
+        "updates": [
+          {
+            "update_id": "UPD-002",
+            "ts": "2026-10-20T16:40:00+02:00",
+            "source": "case_officer",
+            "code": "RECIPIENT_IDENTIFIED",
+            "detail": "Recipient identified as a private person; contact attempted."
+          },
+          {
+            "update_id": "UPD-003",
+            "ts": "2026-10-21T11:20:00+02:00",
+            "source": "case_officer",
+            "code": "RECIPIENT_DELETION_CONFIRMED",
+            "detail": "Recipient confirmed in writing that the file was deleted and not shared."
+          }
+        ]
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T02_INCIDENT_UPDATES",
+          "tables": [
+            "incident_updates"
+          ],
+          "row_ref": "UPD-002,UPD-003",
+          "query_hash": "dc28412153086580a130",
+          "executed_at": "2026-10-22T10:12:27+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": false,
+      "note": ""
+    }
+  ],
+  "legal_basis": [
+    {
+      "article": "GDPR Art. 33(1)",
+      "why": "risk to rights and freedoms (severity medium)"
+    },
+    {
+      "article": "GDPR Art. 33(5)",
+      "why": "every breach is documented internally"
+    }
+  ],
+  "draft_notification": {
+    "to_supervisory_authority": {
+      "a_nature": "misdirected email: Spreadsheet with beneficiary list e-mailed to a wrong external address. Categories: address, benefit_type, name, pesel. Approximately 1200 data subjects and records (access log).",
+      "b_contact": "Data Protection Officer, iod@przykladowo.example (SYNTHETIC)",
+      "c_consequences": "Likely consequences: disclosure of reliance on social assistance (stigma, discrimination); identity fraud using the national identification number.",
+      "d_measures": "Measures taken: recipient identified and contacted; recipient confirmed deletion in writing. Proposed: identify and contact the recipient, request written confirmation of deletion; enforce encryption of e-mailed exports."
+    },
+    "missing": [],
+    "complete": true
+  },
+  "open_questions": [],
+  "clock": {
+    "aware_at": "2026-10-20T09:15:00+02:00",
+    "assumed": false,
+    "deadline": "2026-10-23T09:15:00+02:00",
+    "now": "2026-10-21T12:00:00+02:00",
+    "hours_left": 45.2
+  },
+  "limitations": [
+    "Decision support for a data protection officer, not legal advice.",
+    "All data is synthetic (see data/SYNTHETIC.md).",
+    "Severity follows the ENISA 2013 method; national supervisory authority practice may differ.",
+    "Evidence came from the local dev backend, not from Zetaris."
+  ],
+  "data_backends": [
+    "dev-sqlite"
+  ],
+  "agents": [
+    "planner",
+    "investigator",
+    "evidence_auditor",
+    "risk_assessor",
+    "reviewer_drafter"
+  ],
+  "iterations": 1,
+  "vetoes": [],
+  "errors": [],
+  "llm_enabled": false,
+  "trace_id": "20261022T121227-a7400c",
+  "log_file": "logs/trace-20261022T121227-a7400c.jsonl",
+  "execution_time": 0.044
+}

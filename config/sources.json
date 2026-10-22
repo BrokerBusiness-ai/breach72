@@ -1,0 +1,16 @@
+{
+  "_comment": "Logical table -> physical name. 'dev' is the local SQLite backend; 'zetaris' must match the catalog created in Zetaris (verify after verify.sh).",
+  "dev": {
+    "incidents": "incidents", "incident_updates": "incident_updates", "access_logs": "access_logs",
+    "export_items": "export_items", "ropa": "ropa", "assets": "assets", "processor_contracts": "processor_contracts"
+  },
+  "zetaris": {
+    "incidents": "incident_db.public.incidents",
+    "incident_updates": "incident_db.public.incident_updates",
+    "access_logs": "incident_db.public.access_logs",
+    "export_items": "incident_db.public.export_items",
+    "ropa": "ropa_csv.default.ropa",
+    "assets": "asset_register_csv.default.assets",
+    "processor_contracts": "processor_contracts_csv.default.processor_contracts"
+  }
+}

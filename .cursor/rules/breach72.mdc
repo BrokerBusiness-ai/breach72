@@ -1,0 +1,10 @@
+---
+description: Breach72 project rules for Cursor
+alwaysApply: true
+---
+- Decisions come from app/rules (deterministic, unit-tested). Language models only explain and assess evidence; never let a model output a verdict.
+- All SQL goes through vetted templates in app/queries/templates.py. No free-form text-to-SQL.
+- Every finding carries provenance: source, table, row ids, template id, timestamp.
+- Data is synthetic only (see data/SYNTHETIC.md). Never add real personal data.
+- Secrets live only in .env (gitignored). Use .env.example placeholders.
+- Run `python -m pytest -q` and `python run.py input_examples/case2_misdirected_email.json --backend dev` after every change.

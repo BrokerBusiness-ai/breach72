@@ -1,0 +1,6 @@
+incident_id,case_no,reported_at,aware_at,system_id,category,summary,reporter_role
+INC-2026-001,1,2026-10-19T08:10:00+02:00,2026-10-19T08:30:00+02:00,SYS-LAPTOP-114,lost_device,Employee reports laptop left on a train.,employee
+INC-2026-002,2,2026-10-20T09:05:00+02:00,2026-10-20T09:15:00+02:00,SYS-SOCIAL-REG,misdirected_email,Spreadsheet with beneficiary list e-mailed to a wrong external address.,case_officer
+INC-2026-003,3,2026-10-21T06:40:00+02:00,2026-10-21T07:05:00+02:00,SYS-HR-SRV,ransomware,"HR file server encrypted, ransom note found.",it_admin
+INC-2026-004,4,2026-10-21T15:00:00+02:00,2026-10-21T15:00:00+02:00,SYS-PAYROLL-EXT,processor_breach,Payroll processor reports unauthorised access at its side.,processor
+INC-2026-005,5,2026-10-22T10:00:00+02:00,,SYS-WEB-FORMS,misconfiguration,Contact form submissions found publicly listable; discovery date not recorded.,citizen

@@ -1,0 +1,6 @@
+processing_id,name,system_id,data_categories,special_categories,subject_types,subjects_estimate,processor_id
+PR-01,Staff IT equipment,SYS-LAPTOP-114,name;email;work_documents,no,employees,40,
+PR-07,Social assistance beneficiaries register,SYS-SOCIAL-REG,name;pesel;address;benefit_type,no,beneficiaries,1450,
+PR-03,Personnel files,SYS-HR-SRV,name;pesel;address;salary;sick_leave_certificates,yes,employees,310,
+PR-04,Payroll,SYS-PAYROLL-EXT,name;pesel;bank_account;salary,no,employees,310,PROC-01
+PR-09,Citizen contact form,SYS-WEB-FORMS,name;email;message_text,no,citizens,2600,PROC-02

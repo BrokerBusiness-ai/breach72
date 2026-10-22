@@ -1,0 +1,6 @@
+system_id,name,asset_type,encryption_at_rest,key_location,backup,backup_offline
+SYS-LAPTOP-114,Laptop L-114,laptop,full_disk_aes256,separate_tpm_pin,daily,yes
+SYS-SOCIAL-REG,Social register DB,database,none,none,daily,yes
+SYS-HR-SRV,HR file server,file_server,none,none,daily,yes
+SYS-PAYROLL-EXT,External payroll platform,saas,provider_managed,provider,provider,unknown
+SYS-WEB-FORMS,Website forms module,web_app,none,none,weekly,no

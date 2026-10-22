@@ -1,0 +1,8 @@
+update_id,incident_id,ts,source,code,detail
+UPD-001,INC-2026-001,2026-10-19T09:00:00+02:00,it_report,REMOTE_WIPE_SENT,Remote wipe command queued.
+UPD-002,INC-2026-002,2026-10-20T16:40:00+02:00,case_officer,RECIPIENT_IDENTIFIED,Recipient identified as a private person; contact attempted.
+UPD-003,INC-2026-002,2026-10-21T11:20:00+02:00,case_officer,RECIPIENT_DELETION_CONFIRMED,Recipient confirmed in writing that the file was deleted and not shared.
+UPD-004,INC-2026-003,2026-10-21T13:00:00+02:00,it_report,IT_REPORT_NO_EXFIL,Initial IT report: no evidence of data exfiltration.
+UPD-005,INC-2026-003,2026-10-21T14:30:00+02:00,it_report,BACKUP_RESTORE_STARTED,Restore from offline backup started.
+UPD-006,INC-2026-004,2026-10-21T15:00:00+02:00,processor,PROCESSOR_NOTICE,Processor states it detected the breach on its side 50 hours earlier.
+UPD-007,INC-2026-004,2026-10-19T13:00:00+02:00,processor,PROCESSOR_DETECTED,"Detection time at the processor, as stated in the processor notice."

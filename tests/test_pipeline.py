@@ -62,6 +62,25 @@ def test_conflict_escalates_case3(tmp_path):
     assert "phased_notification" in out["flags"] and "special_categories_art9" in out["flags"]
 
 
+def test_batch_all_writes_six_outputs(tmp_path):
+    from run import main
+    out_dir = tmp_path / "batch"
+    assert main(["--all", "--backend", "dev", "--out-dir", str(out_dir)]) == 0
+    files = sorted(p.name for p in out_dir.glob("*.json"))
+    assert files == [
+        "case1_lost_encrypted_laptop.json",
+        "case2_misdirected_email.json",
+        "case2b_recipient_deleted.json",
+        "case3_ransomware_hr.json",
+        "case4_processor_late_notice.json",
+        "case5_no_detection_date.json",
+    ]
+    case2 = json.loads((out_dir / "case2_misdirected_email.json").read_text(encoding="utf-8"))
+    assert case2["decision"] == "notify_authority_and_individuals"
+    case2b = json.loads((out_dir / "case2b_recipient_deleted.json").read_text(encoding="utf-8"))
+    assert case2b["decision"] == "notify_authority"
+
+
 # ---- templates -----------------------------------------------------------
 def test_template_rejects_unexpected_params():
     with pytest.raises(ValueError):

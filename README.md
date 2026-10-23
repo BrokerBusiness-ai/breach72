@@ -23,10 +23,12 @@ Requirements: Python 3.11+. No third-party runtime packages.
 ```bash
 python -m pip install -r requirements.txt          # pytest only
 python data/generator.py                          # SYNTHETIC data (deterministic)
-python -m pytest -q                               # 58 tests: rule set (EDPB 01/2021 cases), pipeline, Meterless, Nemotron gate
+python -m pytest -q                               # 60 tests: rule set (EDPB 01/2021 cases), pipeline, Meterless, Nemotron gate
 python run.py input_examples/case2_misdirected_email.json --backend dev --out out.json
+python run.py --all --backend dev --out-dir output_examples   # all six cases, empty H-MEM
 python report.py out.json                         # HTML report next to the JSON
 ```
+
 
 Backends:
 

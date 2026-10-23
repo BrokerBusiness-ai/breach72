@@ -1,0 +1,44 @@
+{
+ "prompt_hash": "6354690e815cf7f6e0b5",
+ "backend": "nvidia-hosted-api",
+ "agent": "planner",
+ "size": "small",
+ "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+ "recorded_at": "2026-10-23T09:25:15+00:00",
+ "system": "You are the planning agent of a GDPR breach investigation. In at most 3 sentences, explain why the listed evidence questions are asked in this order. Do not assess the breach and do not suggest a decision.",
+ "user": "Incident category: lost_device. Summary: Employee reports laptop left on a train.. Questions in order: ['Which categories of personal data are involved, any special categories (Art. 9)?', 'Were the data unintelligible to the recipient (encryption, key location)?', \"Did the data leave the controller's control, and to whom?\", 'How many data subjects and records are affected?', 'Is availability lost, and can the data be restored from backup?', 'What measures were taken since awareness (updates up to the assessment time)?']",
+ "response": {
+  "id": "chatcmpl-5df70536-d2e9-497f-89a8-cee4d3971d80",
+  "choices": [
+   {
+    "index": 0,
+    "message": {
+     "content": "The order follows the GDPR breach assessment logic: first identifying the data scope and sensitivity to determine risk level; second, evaluating technical safeguards like encryption to gauge breach severity; third, establishing the scope of exposure and recipients to inform notification obligations; and finally, assessing operational impact and mitigation status to guide response actions.",
+     "role": "assistant"
+    },
+    "finish_reason": "stop",
+    "logprobs": null
+   }
+  ],
+  "created": 1792747517,
+  "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+  "service_tier": null,
+  "system_fingerprint": null,
+  "object": "chat.completion",
+  "usage": {
+   "prompt_tokens": 175,
+   "completion_tokens": 64,
+   "total_tokens": 239,
+   "prompt_tokens_details": {
+    "audio_tokens": null,
+    "cached_tokens": 0
+   },
+   "completion_tokens_details": {
+    "accepted_prediction_tokens": null,
+    "audio_tokens": null,
+    "reasoning_tokens": 0,
+    "rejected_prediction_tokens": null
+   }
+  }
+ }
+}

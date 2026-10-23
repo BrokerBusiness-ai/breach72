@@ -1,0 +1,44 @@
+{
+ "prompt_hash": "aa6e6f735b3e3da7dbe9",
+ "backend": "nvidia-hosted-api",
+ "agent": "planner",
+ "size": "small",
+ "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+ "recorded_at": "2026-10-23T09:26:25+00:00",
+ "system": "You are the planning agent of a GDPR breach investigation. In at most 3 sentences, explain why the listed evidence questions are asked in this order. Do not assess the breach and do not suggest a decision.",
+ "user": "Incident category: processor_breach. Summary: Payroll processor reports unauthorised access at its side.. Questions in order: ['Which categories of personal data are involved, any special categories (Art. 9)?', \"Did the data leave the controller's control, and to whom?\", 'How many data subjects and records are affected?', 'Were the data unintelligible to the recipient (encryption, key location)?', 'Is a processor involved and when did it detect and report the breach?', 'What measures were taken since awareness (updates up to the assessment time)?']",
+ "response": {
+  "id": "chatcmpl-fc0fc435-f22b-459f-bec7-e448964b4ee3",
+  "choices": [
+   {
+    "index": 0,
+    "message": {
+     "content": "The order follows the GDPR breach reporting hierarchy: first identifying the data scope and sensitivity (Art. 33/34) to determine notification obligations; then establishing the breach's reach and recipient to assess risk to data subjects; quantifying the scale for impact assessment; verifying technical safeguards like encryption to evaluate risk severity; confirming processor involvement and timelines to establish accountability; and finally reviewing mitigation measures to gauge compliance and remediation effectiveness.",
+     "role": "assistant"
+    },
+    "finish_reason": "stop",
+    "logprobs": null
+   }
+  ],
+  "created": 1792747586,
+  "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+  "service_tier": null,
+  "system_fingerprint": null,
+  "object": "chat.completion",
+  "usage": {
+   "prompt_tokens": 182,
+   "completion_tokens": 90,
+   "total_tokens": 272,
+   "prompt_tokens_details": {
+    "audio_tokens": null,
+    "cached_tokens": 0
+   },
+   "completion_tokens_details": {
+    "accepted_prediction_tokens": null,
+    "audio_tokens": null,
+    "reasoning_tokens": 0,
+    "rejected_prediction_tokens": null
+   }
+  }
+ }
+}

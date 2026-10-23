@@ -1,0 +1,357 @@
+{
+  "run_id": "20261023T112514-8744b3",
+  "status": "ok",
+  "incident_id": "INC-2026-001",
+  "as_of": "2026-10-19T12:00:00+02:00",
+  "decision": "document_internally",
+  "decision_text": "Document internally only (no notification)",
+  "provisional_decision": "document_internally",
+  "notify_supervisory_authority": false,
+  "notify_data_subjects": false,
+  "escalation_reasons": [],
+  "flags": [],
+  "risk": {
+    "score": 1.0,
+    "band": "low",
+    "components": {
+      "dpc": 2,
+      "ei_level": "negligible",
+      "ei": 0.25,
+      "confidentiality": 0.5,
+      "integrity": 0.0,
+      "availability": 0.0,
+      "malicious": 0.0
+    },
+    "method": "ENISA 2013",
+    "rule_inputs": {
+      "data_type": "behavioural",
+      "dpc_adjustments": [],
+      "identifiability": "maximum",
+      "unintelligible": true,
+      "confidentiality": "unknown_recipients",
+      "integrity": "none",
+      "availability": "none",
+      "malicious": false,
+      "mitigations": []
+    }
+  },
+  "explanation": [
+    "Severity 1.0 (low) = DPC 2 x EI 0.25 + CB 0.5 (ENISA 2013) [F02][F03][F04].",
+    "Rule step: DPC base 2 for behavioural data.",
+    "Rule step: EI negligible: data unintelligible to the recipient (encryption/hashing, key safe).",
+    "Rule step: EI 0.25 (negligible ease of identification).",
+    "Rule step: CB +0.5 for confidentiality (unknown_recipients).",
+    "GDPR Art. 33(1): breach unlikely to result in a risk (severity low).",
+    "GDPR Art. 33(5): every breach is documented internally."
+  ],
+  "model_summary": "The decision to document this breach internally only, without supervisory authority notification, is based on a severity score of 1.0 (low) [F02][F03][F04]. This determination follows the finding that the affected data was unintelligible to any unauthorized finder due to full disk AES-256 encryption with keys held in a separate TPM [F03]. Because the breach is unlikely to result in a risk to the rights and freedoms of data subjects, notification under GDPR Article 33(1) is not required [F03]. However, consistent with GDPR Article 33(5), the incident is documented internally [F03].",
+  "findings": [
+    {
+      "id": "F01",
+      "claim": "aware_at",
+      "statement": "Moment the controller became aware of the breach",
+      "value": {
+        "aware_at": "2026-10-19T08:30:00+02:00",
+        "assumed": false
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T01_INCIDENT_CORE",
+          "tables": [
+            "incidents"
+          ],
+          "row_ref": "INC-2026-001",
+          "query_hash": "2fec2e5e789c7ebba9ce",
+          "executed_at": "2026-10-23T09:25:14+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F02",
+      "claim": "data_categories",
+      "statement": "Data categories in PR-01: email, name, work_documents",
+      "value": {
+        "categories": [
+          "email",
+          "name",
+          "work_documents"
+        ],
+        "special": false,
+        "processing_ids": [
+          "PR-01"
+        ],
+        "processor_ids": [],
+        "subjects_estimate": 40
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T05_ROPA_FOR_SYSTEM",
+          "tables": [
+            "ropa"
+          ],
+          "row_ref": "PR-01",
+          "query_hash": "56fbceafc6d5f9e961a7",
+          "executed_at": "2026-10-23T09:25:15+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F03",
+      "claim": "data_unintelligible",
+      "statement": "Encryption at rest: full_disk_aes256, key: separate_tpm_pin (unintelligible to a finder)",
+      "value": {
+        "unintelligible": true,
+        "basis": "asset_register"
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T06_ASSET_SECURITY",
+          "tables": [
+            "assets"
+          ],
+          "row_ref": "SYS-LAPTOP-114",
+          "query_hash": "a562c0f5fb8bc2dbcfed",
+          "executed_at": "2026-10-23T09:25:15+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T06_ASSET_SECURITY",
+          "tables": [
+            "assets"
+          ],
+          "row_ref": "SYS-LAPTOP-114",
+          "query_hash": "a562c0f5fb8bc2dbcfed",
+          "executed_at": "2026-10-23T09:25:15+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F04",
+      "claim": "disclosure",
+      "statement": "Loss of control: device lost outside the premises",
+      "value": {
+        "left_control": true,
+        "recipient": "unknown",
+        "destinations": [],
+        "actions": []
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T01_INCIDENT_CORE",
+          "tables": [
+            "incidents"
+          ],
+          "row_ref": "INC-2026-001",
+          "query_hash": "2fec2e5e789c7ebba9ce",
+          "executed_at": "2026-10-23T09:25:14+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T02_INCIDENT_UPDATES",
+          "tables": [
+            "incident_updates"
+          ],
+          "row_ref": "UPD-001",
+          "query_hash": "38906ef546c03519d90b",
+          "executed_at": "2026-10-23T09:25:15+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": "T02_INCIDENT_UPDATES",
+      "confidence": "high",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F05",
+      "claim": "affected_count",
+      "statement": "Up to 40 data subjects (ROPA estimate; no record count in the logs)",
+      "value": {
+        "subjects": 40,
+        "basis": "ropa_estimate"
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T05_ROPA_FOR_SYSTEM",
+          "tables": [
+            "ropa"
+          ],
+          "row_ref": "PR-01",
+          "query_hash": "56fbceafc6d5f9e961a7",
+          "executed_at": "2026-10-23T09:25:15+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": "upper bound; estimate from ROPA, not a count"
+    },
+    {
+      "id": "F06",
+      "claim": "availability",
+      "statement": "Backup: daily, offline copy: yes -> availability impact 'none'",
+      "value": {
+        "level": "none"
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T06_ASSET_SECURITY",
+          "tables": [
+            "assets"
+          ],
+          "row_ref": "SYS-LAPTOP-114",
+          "query_hash": "a562c0f5fb8bc2dbcfed",
+          "executed_at": "2026-10-23T09:25:15+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": false,
+      "note": ""
+    },
+    {
+      "id": "F07",
+      "claim": "mitigations",
+      "statement": "Updates recorded up to the assessment time: REMOTE_WIPE_SENT",
+      "value": {
+        "codes": [
+          "REMOTE_WIPE_SENT"
+        ],
+        "updates": [
+          {
+            "update_id": "UPD-001",
+            "ts": "2026-10-19T09:00:00+02:00",
+            "source": "it_report",
+            "code": "REMOTE_WIPE_SENT",
+            "detail": "Remote wipe command queued."
+          }
+        ]
+      },
+      "evidence": [
+        {
+          "backend": "dev-sqlite",
+          "template_id": "T02_INCIDENT_UPDATES",
+          "tables": [
+            "incident_updates"
+          ],
+          "row_ref": "UPD-001",
+          "query_hash": "38906ef546c03519d90b",
+          "executed_at": "2026-10-23T09:25:15+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": false,
+      "note": ""
+    }
+  ],
+  "legal_basis": [
+    {
+      "article": "GDPR Art. 33(1)",
+      "why": "breach unlikely to result in a risk (severity low)"
+    },
+    {
+      "article": "GDPR Art. 33(5)",
+      "why": "every breach is documented internally"
+    }
+  ],
+  "draft_notification": {
+    "to_supervisory_authority": {
+      "a_nature": "lost device: Employee reports laptop left on a train. Categories: email, name, work_documents. Approximately 40 data subjects and records (ropa estimate).",
+      "b_contact": "Data Protection Officer, iod@przykladowo.example (SYNTHETIC)",
+      "c_consequences": "Likely consequences: phishing targeting the data subjects.",
+      "d_measures": "Measures taken: remote wipe of the device initiated. Proposed: confirm remote wipe; rotate credentials stored on the device."
+    },
+    "missing": [],
+    "complete": true
+  },
+  "open_questions": [],
+  "clock": {
+    "aware_at": "2026-10-19T08:30:00+02:00",
+    "assumed": false,
+    "deadline": "2026-10-22T08:30:00+02:00",
+    "now": "2026-10-19T12:00:00+02:00",
+    "hours_left": 68.5
+  },
+  "limitations": [
+    "Decision support for a data protection officer, not legal advice.",
+    "All data is synthetic (see data/SYNTHETIC.md).",
+    "Severity follows the ENISA 2013 method; national supervisory authority practice may differ.",
+    "Evidence came from the local dev backend, not from Zetaris."
+  ],
+  "data_backends": [
+    "dev-sqlite"
+  ],
+  "agents": [
+    "planner",
+    "investigator",
+    "evidence_auditor",
+    "risk_assessor",
+    "reviewer_drafter"
+  ],
+  "iterations": 1,
+  "vetoes": [],
+  "errors": [],
+  "llm_enabled": true,
+  "world_model": {
+    "namespace": "20261023T112514-8744b3",
+    "events": 20,
+    "entities": 3,
+    "relationships": 2,
+    "facts": 14,
+    "facts_superseded": 7,
+    "audit_entries": 20,
+    "file": "logs/.world/20261023T112514-8744b3.json"
+  },
+  "org_memory": {
+    "recalled": [],
+    "reverified": [],
+    "learned": [
+      "mem-3",
+      "mem-4"
+    ],
+    "ledger": {
+      "create": 4,
+      "read": 2,
+      "feedback": 2,
+      "promote": 2
+    },
+    "dir": "C:\\Users\\Marek\\AppData\\Local\\Temp\\breach72-hmem-cnbcq1fb\\gmina-przykladowo-fictional-municipality"
+  },
+  "trace_id": "20261023T112514-8744b3",
+  "log_file": "logs/trace-20261023T112514-8744b3.jsonl",
+  "execution_time": 3.52
+}

@@ -90,6 +90,7 @@ def test_replay_rejects_recording_not_from_nvidia(tmp_path, monkeypatch):
     ("notify_authority", "The controller does not need to notify the supervisory authority [F01].", True),
     ("notify_authority", "The authority is notified; data subjects are not informed [F01].", False),
     ("document_internally", "The breach must be notified to UODO [F01].", True),
+    ("document_internally", "Notification of the supervisory authority is required [F01].", True),
     ("document_internally", "The breach is documented internally under Art. 33(5) [F01].", False),
 ])
 def test_contradiction_gate(decision, text, bad):

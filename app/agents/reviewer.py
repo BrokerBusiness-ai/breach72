@@ -49,7 +49,8 @@ _FID = re.compile(r"\bF\d{2}\b")
 # Statements a summary may not make for a given decision (checked case-insensitively).
 _NEG_NOTIFY = r"(no|not|without|need not|needn't|do(es)? not need to)\s+(\w+\s+){0,3}notif"
 _CONTRADICTIONS = {
-    "document_internally": [r"\bmust (be )?notif", r"\bshould (be )?notif", r"\brequires? notification"],
+    "document_internally": [r"\bmust (be )?notif", r"\bshould (be )?notif",
+                            r"\b(requires? notification|notification\s+(\w+\s+){0,5}is required)"],
     "notify_authority": [_NEG_NOTIFY + r"\w*\s+(\w+\s+){0,3}(supervisory|authority|UODO)",
                          r"\bonly (be )?document", r"\b(must|should) (also )?(communicate|inform|notify) "
                          r"(\w+\s+){0,2}(data subjects|individuals)"],

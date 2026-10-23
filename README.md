@@ -108,7 +108,10 @@ Borderline scores (for example case 08, SE 2.0) still escalate to the DPO in the
   next available Nemotron model and the substitution is logged (`model_substituted`). If chat/completions
   returns HTTP 404 for an account (model listed but not enabled), the next fallback is tried without
   consuming a retry (`model_substituted` with `reason: http_404`). Reasoning models use at least
-  `LLM_MIN_TOKENS` (default 2000); empty content is discarded (`llm_empty`).
+  `LLM_MIN_TOKENS` (default 800); empty content is discarded (`llm_empty`).
+  `LLM_THINKING` defaults to off and sends `chat_template_kwargs.enable_thinking=false` so the completion
+  budget is not spent on reasoning; if the API rejects that field (HTTP 400) it is dropped for the rest of
+  the client and the call is resent once without consuming a retry.
 - Models never produce the decision. The Reviewer accepts a model summary only if (1) every finding id it cites
   exists and (2) it does not contradict the decision (for example "no notification is needed" when the rule says
   notify). Otherwise it is discarded, `llm_output_rejected` is logged with the reason, and the deterministic

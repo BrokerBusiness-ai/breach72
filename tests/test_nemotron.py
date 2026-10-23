@@ -180,11 +180,66 @@ def test_empty_content_returns_none_and_logs_llm_empty(tmp_path, monkeypatch):
     assert not any(e["event"] == "llm_call" for e in events(tr))
 
 
-def test_max_tokens_sent_is_at_least_2000(tmp_path, monkeypatch):
+def test_max_tokens_sent_is_at_least_800(tmp_path, monkeypatch):
     monkeypatch.setenv("NVIDIA_API_KEY", "test-key")
     monkeypatch.delenv("LLM_MIN_TOKENS", raising=False)
+    monkeypatch.delenv("LLM_THINKING", raising=False)
     calls, tr = [], Trace("ttok", tmp_path)
     c = NemotronClient(tr, opener=stub_opener("ok", calls), recordings=tmp_path / "rec")
     assert c.chat("planner", "small", "sys", "user", max_tokens=400) == "ok"
     chat = next(c for c in calls if c[0] == "POST")
-    assert chat[2]["max_tokens"] >= 2000
+    assert chat[2]["max_tokens"] >= 800
+
+
+def test_thinking_off_sends_enable_thinking_false_by_default(tmp_path, monkeypatch):
+    monkeypatch.setenv("NVIDIA_API_KEY", "test-key")
+    monkeypatch.delenv("LLM_THINKING", raising=False)
+    calls, tr = [], Trace("tthink", tmp_path)
+    c = NemotronClient(tr, opener=stub_opener("ok", calls), recordings=tmp_path / "rec")
+    assert c.chat("planner", "small", "sys", "user") == "ok"
+    chat = next(c for c in calls if c[0] == "POST")
+    assert chat[2]["chat_template_kwargs"] == {"enable_thinking": False}
+    call = next(e for e in events(tr) if e["event"] == "llm_call")
+    assert call["data"]["thinking"] == "off"
+
+
+def test_thinking_flag_rejected_on_400_resends_without_flag(tmp_path, monkeypatch):
+    monkeypatch.setenv("NVIDIA_API_KEY", "test-key")
+    monkeypatch.delenv("LLM_THINKING", raising=False)
+    calls, tr = [], Trace("t400", tmp_path)
+
+    def opener(req, timeout=None):
+        body = json.loads(req.data) if req.data else None
+        calls.append((req.get_method(), req.full_url, body))
+        if req.full_url.endswith("/models"):
+            return Resp(json.dumps(CATALOGUE).encode())
+        if body and "chat_template_kwargs" in body:
+            raise urllib.error.HTTPError(
+                req.full_url, 400, "Bad Request", hdrs={},
+                fp=io.BytesIO(b'{"error":"unknown field chat_template_kwargs"}'),
+            )
+        return Resp(json.dumps({"choices": [{"message": {"content": "ok without flag"}}],
+                                "usage": {"total_tokens": 5}}).encode())
+
+    c = NemotronClient(tr, opener=opener, recordings=tmp_path / "rec")
+    assert c.chat("reviewer_drafter", "large", "sys", "user") == "ok without flag"
+    chat_calls = [c for c in calls if c[0] == "POST"]
+    assert len(chat_calls) == 2
+    assert "chat_template_kwargs" in chat_calls[0][2]
+    assert "chat_template_kwargs" not in chat_calls[1][2]
+    rejected = [e for e in events(tr) if e["event"] == "llm_thinking_flag_rejected"]
+    assert len(rejected) == 1
+    call = next(e for e in events(tr) if e["event"] == "llm_call")
+    assert call["data"]["thinking"] == "off" and call["data"]["attempt"] == 1
+
+
+def test_thinking_on_omits_chat_template_kwargs(tmp_path, monkeypatch):
+    monkeypatch.setenv("NVIDIA_API_KEY", "test-key")
+    monkeypatch.setenv("LLM_THINKING", "on")
+    calls, tr = [], Trace("ton", tmp_path)
+    c = NemotronClient(tr, opener=stub_opener("ok", calls), recordings=tmp_path / "rec")
+    assert c.chat("planner", "small", "sys", "user") == "ok"
+    chat = next(c for c in calls if c[0] == "POST")
+    assert "chat_template_kwargs" not in chat[2]
+    call = next(e for e in events(tr) if e["event"] == "llm_call")
+    assert call["data"]["thinking"] == "on"

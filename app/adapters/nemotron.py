@@ -16,6 +16,11 @@ Live mode (NVIDIA_API_KEY set):
 - max_tokens is raised to at least LLM_MIN_TOKENS (reasoning models count
   reasoning tokens against the budget); empty content is logged as llm_empty
   and not recorded; reasoning_content is never recorded or logged;
+- LLM_THINKING defaults to off: the request body includes
+  chat_template_kwargs.enable_thinking=false so the model does not spend the
+  completion budget on reasoning; if the API returns HTTP 400 with that field
+  present, llm_thinking_flag_rejected is logged once, the field is dropped for
+  the rest of this client, and the call is resent immediately (no retry used);
 - every successful response is recorded to recordings/nemotron/<prompt_hash>.json.
 
 Without a key:
@@ -95,14 +100,18 @@ class NemotronClient:
         self.models = {"large": os.environ.get("MODEL_LARGE") or DEFAULTS["large"],
                        "small": os.environ.get("MODEL_SMALL") or DEFAULTS["small"]}
         self.timeout = float(os.environ.get("LLM_TIMEOUT_SECONDS", "60"))
-        self.min_tokens = int(os.environ.get("LLM_MIN_TOKENS", "2000"))
+        self.min_tokens = int(os.environ.get("LLM_MIN_TOKENS", "800"))
         self.max_retries = int(os.environ.get("MAX_RETRIES", "2"))
+        _thinking = os.environ.get("LLM_THINKING", "off").strip().lower()
+        self.thinking = "on" if _thinking in ("on", "true", "1") else "off"
+        self._send_thinking_off = self.thinking == "off"
         self.sample_mode = os.environ.get("SAMPLE_MODE", "true").lower() == "true"
         self.recordings = recordings or RECORDINGS
         self.trace = trace
         self._open = opener or urllib.request.urlopen
         self._catalogue_checked = False
         self._unavailable: set[str] = set()
+        self._thinking_flag_rejected_logged = False
 
     @property
     def enabled(self) -> bool:
@@ -177,9 +186,12 @@ class NemotronClient:
         model = self.models[size]
         attempt = 0
         while attempt <= self.max_retries:
-            body = json.dumps({"model": model, "temperature": 0.2, "max_tokens": tokens,
-                               "messages": [{"role": "system", "content": system},
-                                            {"role": "user", "content": user}]}).encode()
+            req_body = {"model": model, "temperature": 0.2, "max_tokens": tokens,
+                        "messages": [{"role": "system", "content": system},
+                                     {"role": "user", "content": user}]}
+            if self._send_thinking_off:
+                req_body["chat_template_kwargs"] = {"enable_thinking": False}
+            body = json.dumps(req_body).encode()
             req = urllib.request.Request(self.base_url + "/chat/completions", data=body, method="POST",
                                          headers={"Authorization": f"Bearer {self.api_key}",
                                                   "Content-Type": "application/json", "Accept": "application/json"})
@@ -197,10 +209,18 @@ class NemotronClient:
                     self.trace.event(agent, "llm_call", {"attempt": attempt + 1, "prompt_hash": ph,
                                                          "latency_ms": int((time.perf_counter() - t0) * 1000),
                                                          "usage": payload.get("usage", {}),
-                                                         "output_chars": len(text)}, model=model)
+                                                         "output_chars": len(text),
+                                                         "thinking": self.thinking}, model=model)
                 self._record(ph, agent, size, model, system, user, payload)
                 return text
             except urllib.error.HTTPError as exc:
+                if exc.code == 400 and self._send_thinking_off:
+                    self._send_thinking_off = False
+                    if self.trace and not self._thinking_flag_rejected_logged:
+                        self._thinking_flag_rejected_logged = True
+                        self.trace.event(agent, "llm_thinking_flag_rejected",
+                                         {"prompt_hash": ph}, model=model)
+                    continue
                 if exc.code == 404:
                     configured = model
                     self._unavailable.add(model)

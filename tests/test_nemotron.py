@@ -3,16 +3,18 @@ acceptance gate for model text. The HTTP layer is replaced by a stub opener; no 
 produces a decision from model output."""
 import io
 import json
+import urllib.error
 
 import pytest
 
-from app.adapters.nemotron import DEFAULTS, NemotronClient, prompt_hash
+from app.adapters.nemotron import DEFAULTS, FALLBACKS, NemotronClient, prompt_hash
 from app.agents.reviewer import contradicts
 from app.orchestration.graph import run_case
 from app.orchestration.trace import Trace
 
 CASE2 = {"incident_id": "INC-2026-002", "as_of": "2026-10-20T12:00:00+02:00", "dpo_contact": "iod@x.example"}
-CATALOGUE = {"data": [{"id": DEFAULTS["large"]}, {"id": "nvidia/nemotron-3.5-lightning-30b-a3b"}]}
+CATALOGUE = {"data": [{"id": DEFAULTS["large"]}, {"id": DEFAULTS["small"]},
+                      {"id": FALLBACKS["large"][1]}, {"id": FALLBACKS["small"][1]}]}
 
 
 class Resp(io.BytesIO):
@@ -44,11 +46,11 @@ def test_live_call_checks_catalogue_substitutes_retired_model_and_records(tmp_pa
     c = NemotronClient(tr, opener=stub_opener("ok [F01]", calls), recordings=tmp_path / "rec")
     assert c.chat("planner", "small", "sys", "user") == "ok [F01]"
     assert calls[0][1].endswith("/models")
-    assert calls[1][2]["model"] == "nvidia/nemotron-3.5-lightning-30b-a3b"
+    assert calls[1][2]["model"] == DEFAULTS["small"]
     ev = events(tr)
     assert any(e["event"] == "model_substituted" and e["data"]["configured"] == "nvidia/retired-model" for e in ev)
     call = next(e for e in ev if e["event"] == "llm_call")
-    assert call["model"] == "nvidia/nemotron-3.5-lightning-30b-a3b"
+    assert call["model"] == DEFAULTS["small"]
     rec = json.loads((tmp_path / "rec" / f"{prompt_hash('planner', 'small', 'sys', 'user')}.json").read_text())
     assert rec["backend"] == "nvidia-hosted-api" and rec["model"] == call["model"]
 
@@ -135,3 +137,54 @@ def test_prompt_hash_ignores_per_run_identifiers():
     b = "F03 x <fact_a0c73a2b6f40067b; auditor> learned in 20261024T101500-abc123/F02"
     assert prompt_hash("r", "large", "s", a) == prompt_hash("r", "large", "s", b)
     assert prompt_hash("r", "large", "s", a) != prompt_hash("r", "large", "s", a.replace("F03", "F04"))
+
+
+def test_http_404_substitutes_next_fallback_and_succeeds(tmp_path, monkeypatch):
+    monkeypatch.setenv("NVIDIA_API_KEY", "test-key")
+    first, second = FALLBACKS["large"][0], FALLBACKS["large"][1]
+    monkeypatch.setenv("MODEL_LARGE", first)
+    calls, tr = [], Trace("t404", tmp_path)
+
+    def opener(req, timeout=None):
+        body = json.loads(req.data) if req.data else None
+        calls.append((req.get_method(), req.full_url, body))
+        if req.full_url.endswith("/models"):
+            return Resp(json.dumps(CATALOGUE).encode())
+        if body and body.get("model") == first:
+            raise urllib.error.HTTPError(
+                req.full_url, 404, "Not Found", hdrs={},
+                fp=io.BytesIO(b'{"error":"Function not found for account"}'),
+            )
+        return Resp(json.dumps({"choices": [{"message": {"content": "ok from fallback [F01]"}}],
+                                "usage": {"total_tokens": 10}}).encode())
+
+    c = NemotronClient(tr, opener=opener, recordings=tmp_path / "rec")
+    assert c.chat("reviewer_drafter", "large", "sys", "user") == "ok from fallback [F01]"
+    chat_calls = [c for c in calls if c[0] == "POST"]
+    assert chat_calls[0][2]["model"] == first and chat_calls[1][2]["model"] == second
+    sub = next(e for e in events(tr) if e["event"] == "model_substituted" and e["data"].get("reason") == "http_404")
+    assert sub["data"] == {"size": "large", "configured": first, "used": second, "reason": "http_404"}
+    assert sub["model"] == second
+    assert next(e for e in events(tr) if e["event"] == "llm_call")["model"] == second
+
+
+def test_empty_content_returns_none_and_logs_llm_empty(tmp_path, monkeypatch):
+    monkeypatch.setenv("NVIDIA_API_KEY", "test-key")
+    calls, tr = [], Trace("tempty", tmp_path)
+    c = NemotronClient(tr, opener=stub_opener("   ", calls), recordings=tmp_path / "rec")
+    assert c.chat("reviewer_drafter", "large", "sys", "user") is None
+    empty = next(e for e in events(tr) if e["event"] == "llm_empty")
+    assert empty["data"]["usage"] == {"total_tokens": 42}
+    assert empty["model"] == DEFAULTS["large"]
+    assert not list((tmp_path / "rec").glob("*.json"))
+    assert not any(e["event"] == "llm_call" for e in events(tr))
+
+
+def test_max_tokens_sent_is_at_least_2000(tmp_path, monkeypatch):
+    monkeypatch.setenv("NVIDIA_API_KEY", "test-key")
+    monkeypatch.delenv("LLM_MIN_TOKENS", raising=False)
+    calls, tr = [], Trace("ttok", tmp_path)
+    c = NemotronClient(tr, opener=stub_opener("ok", calls), recordings=tmp_path / "rec")
+    assert c.chat("planner", "small", "sys", "user", max_tokens=400) == "ok"
+    chat = next(c for c in calls if c[0] == "POST")
+    assert chat[2]["max_tokens"] >= 2000

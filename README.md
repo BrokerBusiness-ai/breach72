@@ -102,10 +102,13 @@ Borderline scores (for example case 08, SE 2.0) still escalate to the DPO in the
 
 - NVIDIA Nemotron via `integrate.api.nvidia.com` (OpenAI-compatible chat completions), configured in `.env`:
   `MODEL_SMALL` for the Planner's investigation note, `MODEL_LARGE` for the Auditor's conflict note and the
-  Reviewer's plain-language summary. Defaults (confirmed in the live NVIDIA catalogue on 23 October 2026):
-  `nvidia/nemotron-3-super-120b-a12b` (large) and `nvidia/nemotron-nano-3-30b-a3b` (small).
+  Reviewer's plain-language summary. Defaults (confirmed by live chat/completions on 23 October 2026):
+  `nvidia/nemotron-3.5-super-vl-120b-a12b` (large) and `nvidia/nemotron-3.5-lightning-30b-a3b` (small).
 - Before the first call the configured ids are checked against `GET /v1/models`; a retired id is replaced by the
-  next available Nemotron model and the substitution is logged (`model_substituted`).
+  next available Nemotron model and the substitution is logged (`model_substituted`). If chat/completions
+  returns HTTP 404 for an account (model listed but not enabled), the next fallback is tried without
+  consuming a retry (`model_substituted` with `reason: http_404`). Reasoning models use at least
+  `LLM_MIN_TOKENS` (default 2000); empty content is discarded (`llm_empty`).
 - Models never produce the decision. The Reviewer accepts a model summary only if (1) every finding id it cites
   exists and (2) it does not contradict the decision (for example "no notification is needed" when the rule says
   notify). Otherwise it is discarded, `llm_output_rejected` is logged with the reason, and the deterministic

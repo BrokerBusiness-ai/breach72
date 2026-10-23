@@ -17,7 +17,9 @@ CASE2B = dict(CASE2, as_of="2026-10-21T12:00:00+02:00")
 
 @pytest.fixture(autouse=True)
 def _no_llm(monkeypatch):
-    monkeypatch.delenv("NVIDIA_API_KEY", raising=False)
+    # Empty key (not delenv): run.main load_env uses setdefault and would re-inject .env.
+    monkeypatch.setenv("NVIDIA_API_KEY", "")
+    monkeypatch.setenv("SAMPLE_MODE", "false")
 
 
 def test_case2_end_to_end_high_risk(tmp_path):

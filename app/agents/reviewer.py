@@ -46,6 +46,25 @@ PROPOSED = {
     "misconfiguration": "disable public listing, review access logs for downloads, rotate exposed secrets",
 }
 _FID = re.compile(r"\bF\d{2}\b")
+# Statements a summary may not make for a given decision (checked case-insensitively).
+_NEG_NOTIFY = r"(no|not|without|need not|needn't|do(es)? not need to)\s+(\w+\s+){0,3}notif"
+_CONTRADICTIONS = {
+    "document_internally": [r"\bmust (be )?notif", r"\bshould (be )?notif", r"\brequires? notification"],
+    "notify_authority": [_NEG_NOTIFY + r"\w*\s+(\w+\s+){0,3}(supervisory|authority|UODO)",
+                         r"\bonly (be )?document", r"\b(must|should) (also )?(communicate|inform|notify) "
+                         r"(\w+\s+){0,2}(data subjects|individuals)"],
+    "notify_authority_and_individuals": [_NEG_NOTIFY, r"\bonly (be )?document",
+                                         r"\bno (need|requirement) to (communicate|inform)"],
+    "escalate_to_dpo": [r"\bfinal decision is\b", r"\bno (further )?review (is )?needed"],
+}
+
+
+def contradicts(decision: str, text: str) -> str | None:
+    """Return the first forbidden pattern found in `text` for `decision`, else None."""
+    for pat in _CONTRADICTIONS.get(decision, []):
+        if re.search(pat, text, flags=re.IGNORECASE):
+            return pat
+    return None
 
 
 class ReviewerDrafter:
@@ -133,4 +152,10 @@ class ReviewerDrafter:
             self.trace.event(self.name, "llm_output_rejected", {"reason": "missing or unknown finding ids",
                                                                 "cited": sorted(cited)})
             return None
+        bad = contradicts(path.decision, text)
+        if bad:
+            self.trace.event(self.name, "llm_output_rejected", {"reason": "contradicts the decision",
+                                                                "pattern": bad})
+            return None
+        self.trace.event(self.name, "llm_output_accepted", {"cited": sorted(cited)})
         return text.strip()

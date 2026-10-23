@@ -23,7 +23,7 @@ Requirements: Python 3.11+. No third-party runtime packages.
 ```bash
 python -m pip install -r requirements.txt          # pytest only
 python data/generator.py                          # SYNTHETIC data (deterministic)
-python -m pytest -q                               # 45 tests: rule set (EDPB 01/2021 cases) and pipeline
+python -m pytest -q                               # 58 tests: rule set (EDPB 01/2021 cases), pipeline, Meterless, Nemotron gate
 python run.py input_examples/case2_misdirected_email.json --backend dev --out out.json
 python report.py out.json                         # HTML report next to the JSON
 ```
@@ -100,18 +100,26 @@ Borderline scores (for example case 08, SE 2.0) still escalate to the DPO in the
 
 - NVIDIA Nemotron via `integrate.api.nvidia.com` (OpenAI-compatible chat completions), configured in `.env`:
   `MODEL_SMALL` for the Planner's investigation note, `MODEL_LARGE` for the Auditor's conflict note and the
-  Reviewer's plain-language summary.
-- Models never produce the decision. The Reviewer accepts a model summary only if every finding id it cites
-  exists; otherwise it is discarded and `llm_output_rejected` is logged.
-- Without `NVIDIA_API_KEY` no model is called; each skipped call is logged as `llm_skipped` with `model: null`.
+  Reviewer's plain-language summary. Defaults (confirmed in the live NVIDIA catalogue on 23 October 2026):
+  `nvidia/nemotron-3-super-120b-a12b` (large) and `nvidia/nemotron-nano-3-30b-a3b` (small).
+- Before the first call the configured ids are checked against `GET /v1/models`; a retired id is replaced by the
+  next available Nemotron model and the substitution is logged (`model_substituted`).
+- Models never produce the decision. The Reviewer accepts a model summary only if (1) every finding id it cites
+  exists and (2) it does not contradict the decision (for example "no notification is needed" when the rule says
+  notify). Otherwise it is discarded, `llm_output_rejected` is logged with the reason, and the deterministic
+  explanation is used. Accepted text is logged as `llm_output_accepted`.
+- Every live model response is recorded to `recordings/nemotron/<prompt_hash>.json`. With an empty `.env`
+  (`SAMPLE_MODE=true`) a recorded response for the same prompt is replayed and logged as `llm_replay` with the
+  model that produced it; per-run identifiers are normalised before hashing. A prompt without a recording is
+  skipped (`llm_skipped`, `model: null`); nothing is generated locally.
 - Development: the code was written with AI assistance (Anthropic Claude as a coding agent, Cursor). The author
   reviewed the rules and the legal mapping.
 
-## Status (22 October 2026)
+## Status (23 October 2026)
 
 Done: five agents, rule set with tests, five synthetic cases, trace, HTML report, Zetaris adapter with timeout
 (20 s), bounded retries, recording and replay, Meterless World Model (shared case state) and H-MEM (organisational
-memory with re-verification). In progress before the deadline: live Zetaris sources and recordings, live Nemotron
+memory with re-verification), Nemotron catalogue check, recording, replay and the two-condition acceptance gate. In progress before the deadline: live Zetaris sources and recordings, live Nemotron
 calls.
 
 ## Pre-window declaration

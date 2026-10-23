@@ -2,43 +2,146 @@
 
 Role split: MODEL_SMALL for planning text, MODEL_LARGE for evidence assessment and
 explanations. Models never produce the decision; their output is validated by the
-caller and discarded if it cites evidence that does not exist.
+caller and discarded if it cites evidence that does not exist or contradicts the
+decision.
 
-Without NVIDIA_API_KEY the client is disabled: callers fall back to deterministic
-text and the trace records model=null with reason "llm_disabled". Nothing is faked.
+Live mode (NVIDIA_API_KEY set):
+- before the first call the configured model ids are checked against the live
+  catalogue (GET /v1/models); a retired id is replaced by the first available id
+  from FALLBACKS and the substitution is written to the trace (`model_substituted`);
+- every successful response is recorded verbatim to recordings/nemotron/<prompt_hash>.json.
+
+Without a key:
+- with SAMPLE_MODE=true a recorded response for the identical prompt is replayed
+  (`llm_replay`, `model` = the model that produced it, `recorded_at` kept);
+- otherwise, or when no recording matches, the call is skipped (`llm_skipped`,
+  model=null) and callers fall back to deterministic text. Nothing is generated locally.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.request
+from datetime import datetime, timezone
+from pathlib import Path
+
+from app.adapters.base import ROOT
+
+RECORDINGS = ROOT / "recordings" / "nemotron"
+# Model ids confirmed in the live catalogue on 2026-10-23 (GET /v1/models).
+DEFAULTS = {"large": "nvidia/nemotron-3-super-120b-a12b", "small": "nvidia/nemotron-nano-3-30b-a3b"}
+FALLBACKS = {
+    "large": ["nvidia/nemotron-3-super-120b-a12b", "nvidia/llama-3.1-nemotron-ultra-253b-v1",
+              "nvidia/llama-3.1-nemotron-70b-instruct"],
+    "small": ["nvidia/nemotron-nano-3-30b-a3b", "nvidia/nemotron-3.5-lightning-30b-a3b",
+              "nvidia/llama-3.1-nemotron-51b-instruct"],
+}
+
+
+_VOLATILE = [(re.compile(r"\bfact_[0-9a-f]{8,}\b"), "fact_*"),
+             (re.compile(r"\b\d{8}T\d{6}-[0-9a-f]{6}\b"), "<run_id>")]
+
+
+def _stable(text: str) -> str:
+    """Remove per-run identifiers (World Model fact ids, run ids) so that the same case
+    content produces the same prompt hash on every run; needed for SAMPLE_MODE replay."""
+    for pat, repl in _VOLATILE:
+        text = pat.sub(repl, text)
+    return text
+
+
+def prompt_hash(agent: str, size: str, system: str, user: str) -> str:
+    blob = json.dumps([agent, size, _stable(system), _stable(user)], ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:20]
 
 
 class NemotronClient:
-    def __init__(self, trace=None, opener=None):
+    def __init__(self, trace=None, opener=None, recordings: Path | None = None):
         self.api_key = os.environ.get("NVIDIA_API_KEY", "").strip()
         if self.api_key.startswith("your-"):
             self.api_key = ""
         self.base_url = os.environ.get("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1").rstrip("/")
-        self.models = {"large": os.environ.get("MODEL_LARGE", "nvidia/llama-3.3-nemotron-super-49b-v1.5"),
-                       "small": os.environ.get("MODEL_SMALL", "nvidia/nvidia-nemotron-nano-9b-v2")}
+        self.models = {"large": os.environ.get("MODEL_LARGE") or DEFAULTS["large"],
+                       "small": os.environ.get("MODEL_SMALL") or DEFAULTS["small"]}
         self.timeout = float(os.environ.get("SOURCE_TIMEOUT_SECONDS", "20"))
         self.max_retries = int(os.environ.get("MAX_RETRIES", "2"))
+        self.sample_mode = os.environ.get("SAMPLE_MODE", "true").lower() == "true"
+        self.recordings = recordings or RECORDINGS
         self.trace = trace
         self._open = opener or urllib.request.urlopen
+        self._catalogue_checked = False
 
     @property
     def enabled(self) -> bool:
         return bool(self.api_key)
 
-    def chat(self, agent: str, size: str, system: str, user: str, max_tokens: int = 600) -> str | None:
-        model = self.models[size]
-        if not self.enabled:
+    @property
+    def mode(self) -> str:
+        return "live" if self.enabled else ("replay" if self.sample_mode else "disabled")
+
+    # ---- catalogue check -------------------------------------------------
+    def _check_catalogue(self) -> None:
+        self._catalogue_checked = True
+        req = urllib.request.Request(self.base_url + "/models", method="GET",
+                                     headers={"Authorization": f"Bearer {self.api_key}", "Accept": "application/json"})
+        try:
+            with self._open(req, timeout=self.timeout) as resp:
+                ids = {m["id"] for m in json.loads(resp.read().decode("utf-8")).get("data", [])}
+        except (urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError) as exc:
             if self.trace:
-                self.trace.event(agent, "llm_skipped", {"reason": "llm_disabled", "wanted_model": model}, model=None)
+                self.trace.event("nemotron", "catalogue_unavailable", {"error": str(exc)[:200]})
+            return
+        for size, wanted in list(self.models.items()):
+            if wanted in ids:
+                continue
+            repl = next((m for m in FALLBACKS[size] if m in ids), None)
+            if self.trace:
+                self.trace.event("nemotron", "model_substituted" if repl else "model_unavailable",
+                                 {"size": size, "configured": wanted, "used": repl}, model=repl)
+            if repl:
+                self.models[size] = repl
+
+    # ---- recording / replay ----------------------------------------------
+    def _record(self, ph: str, agent: str, size: str, model: str, system: str, user: str, payload: dict) -> None:
+        self.recordings.mkdir(parents=True, exist_ok=True)
+        rec = {"prompt_hash": ph, "backend": "nvidia-hosted-api", "agent": agent, "size": size, "model": model,
+               "recorded_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+               "system": system, "user": user, "response": payload}
+        (self.recordings / f"{ph}.json").write_text(json.dumps(rec, indent=1, ensure_ascii=False), encoding="utf-8")
+
+    def _replay(self, ph: str, agent: str) -> str | None:
+        path = self.recordings / f"{ph}.json"
+        if not path.exists():
             return None
+        rec = json.loads(path.read_text(encoding="utf-8"))
+        if rec.get("backend") != "nvidia-hosted-api" or rec.get("prompt_hash") != ph:
+            if self.trace:
+                self.trace.event(agent, "llm_replay_rejected", {"file": path.name,
+                                                                "reason": "not a live NVIDIA recording"})
+            return None
+        text = rec["response"]["choices"][0]["message"]["content"]
+        if self.trace:
+            self.trace.event(agent, "llm_replay", {"prompt_hash": ph, "recorded_at": rec["recorded_at"],
+                                                   "output_chars": len(text or "")}, model=rec["model"])
+        return text
+
+    # ---- call --------------------------------------------------------------
+    def chat(self, agent: str, size: str, system: str, user: str, max_tokens: int = 600) -> str | None:
+        ph = prompt_hash(agent, size, system, user)
+        if not self.enabled:
+            text = self._replay(ph, agent) if self.sample_mode else None
+            if text is None and self.trace:
+                self.trace.event(agent, "llm_skipped", {"reason": "llm_disabled", "mode": self.mode,
+                                                        "wanted_model": self.models[size], "prompt_hash": ph},
+                                 model=None)
+            return text
+        if not self._catalogue_checked:
+            self._check_catalogue()
+        model = self.models[size]
         body = json.dumps({"model": model, "temperature": 0.2, "max_tokens": max_tokens,
                            "messages": [{"role": "system", "content": system},
                                         {"role": "user", "content": user}]}).encode()
@@ -52,12 +155,13 @@ class NemotronClient:
                     payload = json.loads(resp.read().decode("utf-8"))
                 text = payload["choices"][0]["message"]["content"]
                 if self.trace:
-                    self.trace.event(agent, "llm_call", {"attempt": attempt + 1,
+                    self.trace.event(agent, "llm_call", {"attempt": attempt + 1, "prompt_hash": ph,
                                                          "latency_ms": int((time.perf_counter() - t0) * 1000),
                                                          "usage": payload.get("usage", {}),
                                                          "output_chars": len(text or "")}, model=model)
+                self._record(ph, agent, size, model, system, user, payload)
                 return text
-            except (urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError) as exc:
+            except (urllib.error.URLError, TimeoutError, KeyError, IndexError, json.JSONDecodeError) as exc:
                 if self.trace:
                     self.trace.event(agent, "llm_error", {"attempt": attempt + 1, "error": str(exc)[:200]},
                                      model=model)

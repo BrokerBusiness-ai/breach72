@@ -15,7 +15,7 @@
     "nvidia": "Nemotron via the hosted NVIDIA API; explains and assesses evidence, never decides",
     "cursor": "development workspace with project rules in .cursor/rules"
   },
-  "models": {"large": "nvidia/llama-3.3-nemotron-super-49b-v1.5", "small": "nvidia/nvidia-nemotron-nano-9b-v2"},
+  "models": {"large": "nvidia/nemotron-3-super-120b-a12b", "small": "nvidia/nemotron-nano-3-30b-a3b"},
   "entrypoint": "python run.py input_examples/case2_misdirected_email.json",
   "sample_mode": "SAMPLE_MODE=true replays recorded Zetaris responses; no credentials needed",
   "data": "synthetic only, see data/SYNTHETIC.md",

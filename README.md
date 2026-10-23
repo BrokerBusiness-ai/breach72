@@ -23,7 +23,7 @@ Requirements: Python 3.11+. No third-party runtime packages.
 ```bash
 python -m pip install -r requirements.txt          # pytest only
 python data/generator.py                          # SYNTHETIC data (deterministic)
-python -m pytest -q                               # 60 tests: rule set (EDPB 01/2021 cases), pipeline, Meterless, Nemotron gate
+python -m pytest -q                               # 82 tests: rule set (EDPB 01/2021 cases), pipeline, Meterless, Nemotron gate, API, replay check
 python run.py input_examples/case2_misdirected_email.json --backend dev --out out.json
 python run.py --all --backend dev --out-dir output_examples   # all six cases, empty H-MEM
 python report.py out.json                         # HTML report next to the JSON
@@ -47,6 +47,13 @@ curl -s -X POST localhost:8072/run -H "Content-Type: application/json" -d '{"cas
 ```
 
 `POST /run` takes either `{"case_id": ..., "backend": ...}` for a file in `input_examples/` or a full case object in the same schema. Invalid input returns `{"type", "message", "recoverable"}` with HTTP 400; internal errors return HTTP 500 with the exception class only.
+
+Recording and replay check (live Zetaris and NVIDIA values in `.env`):
+
+```bash
+python scripts/record_and_verify.py   # live run on Zetaris + Nemotron, then the same six cases in SAMPLE_MODE
+                                       # with an empty environment; writes docs/replay_check.json, exit 0 only on a full match
+```
 
 Docker: `docker build -t breach72 . && docker run --rm breach72 input_examples/case2_misdirected_email.json`.
 
@@ -137,8 +144,9 @@ Borderline scores (for example case 08, SE 2.0) still escalate to the DPO in the
 
 Done: five agents, rule set with tests, five synthetic cases, trace, HTML report, Zetaris adapter with timeout
 (20 s), bounded retries, recording and replay, Meterless World Model (shared case state) and H-MEM (organisational
-memory with re-verification), Nemotron catalogue check, recording, replay and the two-condition acceptance gate. In progress before the deadline: live Zetaris sources and recordings, live Nemotron
-calls.
+memory with re-verification), Nemotron catalogue check, recording, replay and the two-condition acceptance gate. Live Nemotron calls verified on 23 October (six cases, all summaries accepted by the gates, recordings in
+`recordings/nemotron/`). In progress before the deadline: live Zetaris sources and recordings, then
+`scripts/record_and_verify.py` for the SAMPLE_MODE replay check.
 
 ## Pre-window declaration
 

@@ -38,6 +38,16 @@ Backends:
 | `replay` | default when `SAMPLE_MODE=true`: replays recorded live Zetaris responses; all agent logic runs for real | nothing |
 | `dev` | local SQLite over the synthetic CSVs, for development; every output says so in `limitations` | nothing |
 
+HTTP API (standard library, no extra packages; binds to 127.0.0.1 by default):
+
+```bash
+python run.py --serve --port 8072
+curl -s localhost:8072/health
+curl -s -X POST localhost:8072/run -H "Content-Type: application/json" -d '{"case_id": "case3_ransomware_hr", "backend": "dev"}'
+```
+
+`POST /run` takes either `{"case_id": ..., "backend": ...}` for a file in `input_examples/` or a full case object in the same schema. Invalid input returns `{"type", "message", "recoverable"}` with HTTP 400; internal errors return HTTP 500 with the exception class only.
+
 Docker: `docker build -t breach72 . && docker run --rm breach72 input_examples/case2_misdirected_email.json`.
 
 ## How a decision is made

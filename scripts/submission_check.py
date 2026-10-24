@@ -78,8 +78,50 @@ def read_text(path: Path) -> str | None:
         return None
 
 
+def agent_slug(name: str) -> str:
+    """'Reviewer & Drafter' -> 'reviewer_drafter', the form used in run results."""
+    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+
+
+def check_output_examples(root: Path, expected_agents: list[str]) -> dict:
+    """Every recorded case result must be a real pipeline output, not a hand-written verdict."""
+    base = root / "output_examples"
+    results = sorted(base.glob("*/*.json")) if base.is_dir() else []
+    if not results:
+        return check("output_examples", "WARN", "no case results under output_examples/")
+    want = {agent_slug(a) for a in expected_agents}
+    bad = []
+    for f in results:
+        rel = f.relative_to(root).as_posix()
+        try:
+            r = json.loads(f.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            bad.append(f"{rel}: unreadable")
+            continue
+        if not isinstance(r, dict):
+            bad.append(f"{rel}: not an object")
+            continue
+        problems = []
+        if not r.get("trace_id"):
+            problems.append("trace_id")
+        if not r.get("decision"):
+            problems.append("decision")
+        agents = {agent_slug(a) for a in r.get("agents") or [] if isinstance(a, str)}
+        if not agents or (want and not want <= agents):
+            problems.append("agents")
+        lim = " ".join(x for x in r.get("limitations") or [] if isinstance(x, str))
+        if "synthetic" not in lim.lower():
+            problems.append("synthetic marker")
+        if problems:
+            bad.append(f"{rel}: {', '.join(problems)}")
+    dirs = len({f.parent for f in results})
+    return check("output_examples", "FAIL" if bad else "PASS",
+                 "; ".join(bad[:5]) if bad else f"{len(results)} results in {dirs} folders, trace, 5 agents, synthetic")
+
+
 def run_checks(root: Path = ROOT) -> list[dict]:
     results = []
+    meta_agents: list[str] = []
 
     missing = [f for f in REQUIRED_FILES if not (root / f).is_file()]
     results.append(check("required_files", "FAIL" if missing else "PASS",
@@ -93,6 +135,7 @@ def run_checks(root: Path = ROOT) -> list[dict]:
 
     try:
         meta = json.loads((root / "metadata.json").read_text(encoding="utf-8"))
+        meta_agents = [a for a in meta.get("agents", []) if isinstance(a, str)]
         problems = [k for k in METADATA_KEYS if k not in meta]
         if len(meta.get("agents", [])) != 5:
             problems.append("agents != 5")
@@ -157,6 +200,8 @@ def run_checks(root: Path = ROOT) -> list[dict]:
     cursor = list((root / "docs" / "cursor_usage").glob("*.md"))
     results.append(check("cursor_evidence", "PASS" if len(cursor) >= 3 else "FAIL",
                          f"{len(cursor)} documented Cursor sessions"))
+
+    results.append(check_output_examples(root, meta_agents))
 
     cases = list((root / "input_examples").glob("*.json"))
     results.append(check("test_cases", "PASS" if len(cases) >= 5 else "FAIL", f"{len(cases)} input examples"))

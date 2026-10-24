@@ -28,7 +28,7 @@
     {
       "check": "secret_scan",
       "status": "PASS",
-      "reason": "100 tracked text files clean"
+      "reason": "102 tracked text files clean"
     },
     {
       "check": "dash_scan",
@@ -49,6 +49,11 @@
       "check": "cursor_evidence",
       "status": "PASS",
       "reason": "4 documented Cursor sessions"
+    },
+    {
+      "check": "output_examples",
+      "status": "PASS",
+      "reason": "12 results in 2 folders, trace, 5 agents, synthetic"
     },
     {
       "check": "test_cases",

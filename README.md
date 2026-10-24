@@ -23,7 +23,7 @@ Requirements: Python 3.11+. No third-party runtime packages.
 ```bash
 python -m pip install -r requirements.txt          # pytest only
 python data/generator.py                          # SYNTHETIC data (deterministic)
-python -m pytest -q                               # 82 tests: rule set (EDPB 01/2021 cases), pipeline, Meterless, Nemotron gate, API, replay check
+python -m pytest -q                               # 87 tests: rule set (EDPB 01/2021 cases), pipeline, Meterless, Nemotron gate, API, replay check
 python run.py input_examples/case2_misdirected_email.json --backend dev --out out.json
 python run.py --all --backend dev --out-dir output_examples   # all six cases, empty H-MEM
 python report.py out.json                         # HTML report next to the JSON
@@ -56,6 +56,8 @@ python scripts/record_and_verify.py   # live run on Zetaris + Nemotron, then the
 ```
 
 Docker: `docker build -t breach72 . && docker run --rm breach72 input_examples/case2_misdirected_email.json`.
+
+Submission self-check (no network): `python scripts/submission_check.py` prints PASS/FAIL/WARN for required files, README sections, metadata.json, `.env` hygiene, a secret scan and a dash scan over tracked files, recordings and Cursor evidence; `--json` writes `docs/submission_check.json`.
 
 ## How a decision is made
 

@@ -1,0 +1,61 @@
+{
+  "results": [
+    {
+      "check": "required_files",
+      "status": "PASS",
+      "reason": "7 present"
+    },
+    {
+      "check": "readme_sections",
+      "status": "PASS",
+      "reason": "all required sections"
+    },
+    {
+      "check": "metadata_json",
+      "status": "PASS",
+      "reason": "keys, 5 agents, 4 sponsors"
+    },
+    {
+      "check": "env_hygiene",
+      "status": "PASS",
+      "reason": "'.env' ignored, '.env.example' kept, placeholders only"
+    },
+    {
+      "check": "env_not_tracked",
+      "status": "PASS",
+      "reason": ".env not tracked"
+    },
+    {
+      "check": "secret_scan",
+      "status": "PASS",
+      "reason": "100 tracked text files clean"
+    },
+    {
+      "check": "dash_scan",
+      "status": "PASS",
+      "reason": "no U+2013/U+2014"
+    },
+    {
+      "check": "zetaris_recordings",
+      "status": "WARN",
+      "reason": "sample mode cannot replay until a live Zetaris run is recorded"
+    },
+    {
+      "check": "recordings_clean",
+      "status": "PASS",
+      "reason": "no reasoning_content, no keys"
+    },
+    {
+      "check": "cursor_evidence",
+      "status": "PASS",
+      "reason": "4 documented Cursor sessions"
+    },
+    {
+      "check": "test_cases",
+      "status": "PASS",
+      "reason": "6 input examples"
+    }
+  ],
+  "fail": 0,
+  "warn": 1
+}

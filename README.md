@@ -23,7 +23,7 @@ Requirements: Python 3.11+. No third-party runtime packages.
 ```bash
 python -m pip install -r requirements.txt          # pytest only
 python data/generator.py                          # SYNTHETIC data (deterministic)
-python -m pytest -q                               # 91 tests: rule set (EDPB 01/2021 cases), pipeline, Meterless, Nemotron gate, API, replay check
+python -m pytest -q                               # 92 tests: rule set (EDPB 01/2021 cases), pipeline, Meterless, Nemotron gate, API, replay check
 python run.py input_examples/case2_misdirected_email.json --backend dev --out out.json
 python run.py --all --backend dev --out-dir output_examples   # all six cases, empty H-MEM
 python report.py out.json                         # HTML report next to the JSON
@@ -37,6 +37,8 @@ Backends:
 | `zetaris` | live queries through Zetaris; every response is recorded to `recordings/` | `.env` (see `.env.example`) |
 | `replay` | default when `SAMPLE_MODE=true`: replays recorded live Zetaris responses; all agent logic runs for real | nothing |
 | `dev` | local SQLite over the synthetic CSVs, for development; every output says so in `limitations` | nothing |
+
+Offline demo from a clean clone with an empty `.env`: `python run.py --all --backend dev`. The data layer is the local SYNTHETIC SQLite store, and the Nemotron calls replay responses recorded from the live NVIDIA API (`recordings/nemotron/`); the rule set, the auditor's veto and re-verification and the drafting gates run for real. Until live Zetaris recordings are committed, the default `replay` backend stops with `source_unavailable` and points to this command instead of inventing data.
 
 HTTP API (standard library, no extra packages; binds to 127.0.0.1 by default):
 

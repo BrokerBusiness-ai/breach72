@@ -15,6 +15,10 @@ from app.adapters.zetaris import RECORDINGS, ZetarisBackend
 from app.queries.templates import TEMPLATES
 
 
+OFFLINE_HINT = ("no Zetaris recordings yet? for the offline demo run `python run.py --all --backend dev`, "
+                "which runs the full pipeline on the SYNTHETIC SQLite data and replays recorded live Nemotron responses")
+
+
 class ZetarisReplayBackend:
     name = "zetaris-replay"
 
@@ -26,7 +30,8 @@ class ZetarisReplayBackend:
         path = self.recordings / f"{qh}.json"
         t0 = time.perf_counter()
         if not path.exists():
-            raise SourceError(f"no Zetaris recording for {template_id} {params} (hash {qh})", recoverable=False)
+            raise SourceError(f"no Zetaris recording for {template_id} {params} (hash {qh}); {OFFLINE_HINT}",
+                              recoverable=False)
         rec = json.loads(path.read_text(encoding="utf-8"))
         if rec.get("backend") != "zetaris" or rec.get("query_hash") != qh:
             raise SourceError(f"recording {path.name} is not a live Zetaris recording", recoverable=False)

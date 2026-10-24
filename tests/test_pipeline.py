@@ -138,3 +138,12 @@ def test_replay_rejects_missing_and_foreign_recordings(tmp_path):
                                                      "recorded_at": "t", "response": {"data": []}}))
     with pytest.raises(SourceError):
         rb.query("T01_INCIDENT_CORE", {"incident_id": "x"})
+
+
+def test_replay_missing_recording_points_to_offline_demo(tmp_path):
+    with pytest.raises(SourceError) as exc:
+        ZetarisReplayBackend(recordings=tmp_path).query("T01_INCIDENT_CORE", {"incident_id": "INC-2026-002"})
+    msg = str(exc.value)
+    assert "no Zetaris recording" in msg
+    assert "--backend dev" in msg and "Nemotron" in msg
+    assert exc.value.recoverable is False

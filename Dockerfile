@@ -1,4 +1,4 @@
-# Breach72: runs the agents in SAMPLE_MODE (replayed Zetaris responses) or against a live Zetaris.
+# Breach72: runs the agents offline (SYNTHETIC SQLite, replayed Nemotron) or against a live Zetaris (--env-file .env).
 FROM python:3.11-slim
 WORKDIR /app
 COPY requirements.txt .
@@ -7,4 +7,5 @@ COPY . .
 ENV SAMPLE_MODE=true PYTHONUNBUFFERED=1
 RUN python data/generator.py && python -m pytest -q
 ENTRYPOINT ["python", "run.py"]
-CMD ["input_examples/case2_misdirected_email.json"]
+# Default: offline demo, all six cases on the local SYNTHETIC backend, Nemotron replayed from recordings.
+CMD ["--all", "--backend", "dev"]

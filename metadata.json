@@ -3,22 +3,36 @@
   "hackathon": "Open Agent Hackathon 2026",
   "track": "Track 2: The Agent That Can Explain Why",
   "team": "Archaios",
-  "members": ["Marek Porycki"],
+  "members": [
+    "Marek Porycki"
+  ],
   "organisation": "Broker Business sp. z o.o. (brokerbusiness.eu)",
   "repository": "https://github.com/BrokerBusiness-ai/breach72",
   "license": "Apache-2.0",
   "summary": "Agents that investigate a personal data breach across separate systems and tell the data protection officer, within the 72-hour GDPR window, whether to notify the supervisory authority and the affected people, and why.",
-  "agents": ["Planner", "Investigator", "Evidence Auditor", "Risk Assessor", "Reviewer & Drafter"],
+  "agents": [
+    "Planner",
+    "Investigator",
+    "Evidence Auditor",
+    "Risk Assessor",
+    "Reviewer & Drafter"
+  ],
   "sponsor_technologies": {
     "zetaris": "governed SQL access to four synthetic source systems through vetted templates; responses recorded for sample mode",
     "meterless": "World Model (case state, evidence) and H-MEM (verified organisational facts) per the Meterless reference architectures",
     "nvidia": "Nemotron via the hosted NVIDIA API; explains and assesses evidence, never decides",
     "cursor": "development workspace with project rules in .cursor/rules"
   },
-  "models": {"large": "nvidia/nemotron-3.5-super-vl-120b-a12b", "small": "nvidia/nemotron-3.5-lightning-30b-a3b"},
+  "models": {
+    "large": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+    "small": "nvidia/nemotron-3.5-lightning-30b-a3b"
+  },
   "entrypoint": "python run.py input_examples/case2_misdirected_email.json",
-  "sample_mode": "SAMPLE_MODE=true replays recorded Zetaris responses; no credentials needed",
+  "sample_mode": "SAMPLE_MODE=true replays recorded live responses (Zetaris via the replay backend once recordings are committed; Nemotron from recordings/nemotron); no credentials needed",
   "data": "synthetic only, see data/SYNTHETIC.md",
   "demo_video": "docs/OAH2026-Archaios-ExplainWhy-Demo.mp4",
-  "deck": "docs/Breach72_deck.pdf"
+  "deck": "docs/Breach72_deck.pdf",
+  "offline_demo": "python run.py --all --backend dev",
+  "docker": "docker build -t breach72 . && docker run --rm breach72",
+  "cursor_usage": "docs/cursor_usage (4 Cursor Agent sessions, 23 October 2026)"
 }

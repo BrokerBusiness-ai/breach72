@@ -57,7 +57,14 @@ python scripts/record_and_verify.py   # live run on Zetaris + Nemotron, then the
                                        # with an empty environment; writes docs/replay_check.json, exit 0 only on a full match
 ```
 
-Docker: `docker build -t breach72 . && docker run --rm breach72 input_examples/case2_misdirected_email.json`.
+Docker: `docker build -t breach72 . && docker run --rm breach72` runs the offline demo (all six cases on the
+`dev` backend, Nemotron replayed from recordings). A single case: `docker run --rm breach72
+input_examples/case3_ransomware_hr.json --backend dev`. The image contains no `.env`; pass live values with
+`--env-file .env` to use `--backend zetaris`.
+
+Deck: `python scripts/build_deck.py` rebuilds `docs/Breach72_deck.pdf` (8 slides) from the repository state
+(metadata.json, output_examples, traces, pytest collection, recordings), so the slides cannot drift from the
+code. Needs `reportlab` (development only, not a runtime dependency).
 
 Submission self-check (no network): `python scripts/submission_check.py` prints PASS/FAIL/WARN for required files, README sections, metadata.json, `.env` hygiene, a secret scan and a dash scan over tracked files, recordings, Cursor evidence and every result in `output_examples/` (trace id, decision, all five agents, synthetic-data marker); `--json` writes `docs/submission_check.json`.
 
@@ -141,16 +148,48 @@ Borderline scores (for example case 08, SE 2.0) still escalate to the DPO in the
   (`SAMPLE_MODE=true`) a recorded response for the same prompt is replayed and logged as `llm_replay` with the
   model that produced it; per-run identifiers are normalised before hashing. A prompt without a recording is
   skipped (`llm_skipped`, `model: null`); nothing is generated locally.
+- NVIDIA Nemotron usage in the live run of 23 October 2026 (six cases, `--backend dev`, from the JSONL traces):
+
+  | Agent | Model | Calls | Median latency |
+  |---|---|---|---|
+  | Planner | nvidia/nemotron-3.5-lightning-30b-a3b | 6 | 1.1 s |
+  | Evidence Auditor (conflict note, case 3) | nvidia/nemotron-3.5-super-vl-120b-a12b | 1 | 0.9 s |
+  | Reviewer & Drafter | nvidia/nemotron-3.5-super-vl-120b-a12b | 6 | 2.6 s |
+
+  About 7 500 tokens in total; 3 transient API errors (two read timeouts, one HTTP 500) were recovered by bounded
+  retries, and all six summaries passed the citation and contradiction gates. Two sizes because the Planner's
+  note is short and frequent, while the Auditor and Reviewer must read every finding and cite it correctly.
 - Development: the code was written with AI assistance (Anthropic Claude as a coding agent, Cursor). The author
   reviewed the rules and the legal mapping.
 
-## Status (23 October 2026)
+## Status (26 October 2026)
 
-Done: five agents, rule set with tests, five synthetic cases, trace, HTML report, Zetaris adapter with timeout
-(20 s), bounded retries, recording and replay, Meterless World Model (shared case state) and H-MEM (organisational
-memory with re-verification), Nemotron catalogue check, recording, replay and the two-condition acceptance gate. Live Nemotron calls verified on 23 October (six cases, all summaries accepted by the gates, recordings in
-`recordings/nemotron/`). In progress before the deadline: live Zetaris sources and recordings, then
-`scripts/record_and_verify.py` for the SAMPLE_MODE replay check.
+Done and tested: five agents, rule set with tests on EDPB 01/2021 cases, six synthetic cases, JSONL trace,
+HTML report, HTTP API, Zetaris adapter with timeout (20 s), bounded retries, recording and replay, Meterless
+World Model and H-MEM, Nemotron catalogue check, recording, replay and the two-condition acceptance gate,
+`scripts/record_and_verify.py`, `scripts/submission_check.py`, `scripts/build_deck.py`. Live Nemotron calls
+verified on 23 October. Feature freeze: tag `feature-freeze-2026-10-24`; since then only documentation and fixes.
+Open: live Zetaris sources and recordings. Until they are committed the offline demo runs on the local
+SYNTHETIC SQLite backend and every output says so in `limitations`.
+
+## Cursor usage
+
+The repository is a Cursor workspace with project rules in `.cursor/rules/breach72.mdc` (decisions only from
+`app/rules`, vetted SQL templates only, no secrets, ASCII hyphens). Four Cursor Agent sessions are documented
+with the full prompt and result in `docs/cursor_usage/`:
+
+1. `01_contradiction_gate.md` (23 October): Cursor found a model sentence that contradicted a
+   "document internally" decision but passed the gate, fixed the pattern and added the test case.
+2. `02_batch_mode.md` (23 October): `run.py --all`, six cases in a fixed order with an empty organisational
+   memory, so recorded prompts replay exactly as in a clean clone.
+3. `03_nemotron_live_fallback.md` (23 October): after the first live NVIDIA test, model ids verified by real
+   chat calls, fallback on HTTP 404 without consuming a retry, separate 60 s model timeout; Cursor also fixed
+   tests that had been reading the real key from `.env`.
+4. `04_nemotron_thinking_off.md` (23 October): reasoning off by default with a fallback on HTTP 400 and the
+   setting recorded in the trace.
+
+After 23 October the Cursor Agent CLI reported the free-plan usage limit on every attempt; later commits were
+written by an AI coding agent outside Cursor and say so in their commit messages.
 
 ## Pre-window declaration
 
@@ -160,7 +199,7 @@ tools installed.
 
 ## Third-Party Code and Licences
 
-- Python standard library; `pytest` (MIT) for tests.
+- Python standard library; `pytest` (MIT) for tests; `reportlab` (BSD) only to build the deck.
 - Meterless reference architectures (Apache-2.0, github.com/Meterless/Meterless, commit 1742dec): the World Model
   and H-MEM modules are Python ports of the TypeScript reference (id grammar, event fold, retrieval formula,
   feedback deltas, ledger); file headers name the source files.

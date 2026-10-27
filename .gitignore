@@ -16,3 +16,7 @@ data/synthetic/*.sqlite
 # Meterless runtime state
 logs/.world/
 memory/
+
+video/k66z/frames/
+video/k66z/out/
+video/k66z/render.out

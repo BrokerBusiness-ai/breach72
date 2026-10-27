@@ -1,0 +1,377 @@
+{
+  "run_id": "20261027T112214-63cf87",
+  "status": "ok",
+  "incident_id": "INC-2026-005",
+  "as_of": "2026-10-22T12:00:00+02:00",
+  "decision": "escalate_to_dpo",
+  "decision_text": "Escalate to the DPO for a human decision",
+  "provisional_decision": "notify_authority_and_individuals",
+  "notify_supervisory_authority": true,
+  "notify_data_subjects": true,
+  "escalation_reasons": [
+    "severity score 3.0 is near a band threshold",
+    "sources conflict on a decisive fact",
+    "awareness time not recorded; earliest reliable time assumed"
+  ],
+  "flags": [
+    "phased_notification"
+  ],
+  "risk": {
+    "score": 3.0,
+    "band": "high",
+    "components": {
+      "dpc": 2,
+      "ei_level": "maximum",
+      "ei": 1.0,
+      "confidentiality": 0.5,
+      "integrity": 0.0,
+      "availability": 0.0,
+      "malicious": 0.5
+    },
+    "method": "ENISA 2013",
+    "rule_inputs": {
+      "data_type": "behavioural",
+      "dpc_adjustments": [],
+      "identifiability": "maximum",
+      "unintelligible": false,
+      "confidentiality": "unknown_recipients",
+      "integrity": "none",
+      "availability": "none",
+      "malicious": true,
+      "mitigations": []
+    }
+  },
+  "explanation": [
+    "Severity 3.0 (high) = DPC 2 x EI 1.0 + CB 1.0 (ENISA 2013) [F02][F05][F03].",
+    "Rule step: DPC base 2 for behavioural data.",
+    "Rule step: EI 1.0 (maximum ease of identification).",
+    "Rule step: CB +0.5 for confidentiality (unknown_recipients).",
+    "Rule step: CB +0.5 for malicious (malicious intent).",
+    "Rule step: Score 3.0 is within 0.25 of a band threshold: human review required.",
+    "GDPR Art. 33(1): risk to rights and freedoms (severity high).",
+    "GDPR Art. 34(1): likely high risk (severity high).",
+    "GDPR Art. 33(5): every breach is documented internally.",
+    "GDPR Art. 33(4): information not yet complete: notify in phases.",
+    "Escalated to the DPO because: severity score 3.0 is near a band threshold; sources conflict on a decisive fact; awareness time not recorded; earliest reliable time assumed."
+  ],
+  "model_summary": "The incident has been escalated to the DPO for a human decision because the severity score of 3.0 falls within 0.25 of a band threshold [F02][F05][F03]. The decision is to notify the supervisory authority and affected individuals [F03][F04]. Data was disclosed outside the controller via directory_listing to 203.0.113.50 [F03], affecting 2,600 records [F04], with no encryption at rest [F05]. Internal documentation of the breach is required under GDPR Art. 33(5), with phased notification permitted if information is incomplete under Art. 33(4).",
+  "findings": [
+    {
+      "id": "F01",
+      "claim": "aware_at",
+      "statement": "Moment the controller became aware of the breach (assumed: earliest reliable record)",
+      "value": {
+        "aware_at": "2026-10-22T09:40:00+02:00",
+        "assumed": true
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T01_INCIDENT_CORE",
+          "tables": [
+            "incidents"
+          ],
+          "row_ref": "INC-2026-005",
+          "query_hash": "27bbe5573a4385c5bb81",
+          "executed_at": "2026-10-27T10:22:14+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "zetaris",
+          "template_id": "T03_TRANSFER_EVENTS",
+          "tables": [
+            "access_logs"
+          ],
+          "row_ref": "LOG-0006",
+          "query_hash": "d57da44fa51c17bb52cd",
+          "executed_at": "2026-10-27T10:22:14+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F02",
+      "claim": "data_categories",
+      "statement": "Data categories in PR-09: email, message_text, name",
+      "value": {
+        "categories": [
+          "email",
+          "message_text",
+          "name"
+        ],
+        "special": false,
+        "processing_ids": [
+          "PR-09"
+        ],
+        "processor_ids": [
+          "PROC-02"
+        ],
+        "subjects_estimate": 2600
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T05_ROPA_FOR_SYSTEM",
+          "tables": [
+            "ropa"
+          ],
+          "row_ref": "PR-09",
+          "query_hash": "564e0e5be78a0714044e",
+          "executed_at": "2026-10-27T10:22:16+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F03",
+      "claim": "disclosure",
+      "statement": "Data sent outside the controller: directory_listing to 203.0.113.50",
+      "value": {
+        "left_control": true,
+        "recipient": "unknown",
+        "destinations": [
+          "203.0.113.50"
+        ],
+        "actions": [
+          "directory_listing"
+        ],
+        "bytes": 88000
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T03_TRANSFER_EVENTS",
+          "tables": [
+            "access_logs"
+          ],
+          "row_ref": "LOG-0006",
+          "query_hash": "d57da44fa51c17bb52cd",
+          "executed_at": "2026-10-27T10:22:16+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "zetaris",
+          "template_id": "T02_INCIDENT_UPDATES",
+          "tables": [
+            "incident_updates"
+          ],
+          "row_ref": "none",
+          "query_hash": "244c977ac631893fb171",
+          "executed_at": "2026-10-27T10:22:17+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": "T02_INCIDENT_UPDATES",
+      "confidence": "high",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F04",
+      "claim": "affected_count",
+      "statement": "2600 records left the system in the logged event(s)",
+      "value": {
+        "subjects": 2600,
+        "basis": "access_log"
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T03_TRANSFER_EVENTS",
+          "tables": [
+            "access_logs"
+          ],
+          "row_ref": "LOG-0006",
+          "query_hash": "d57da44fa51c17bb52cd",
+          "executed_at": "2026-10-27T10:22:17+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "zetaris",
+          "template_id": "T04_EXPORT_ITEMS_COUNT",
+          "tables": [
+            "export_items"
+          ],
+          "row_ref": "count=0,subjects=0",
+          "query_hash": "304775506095c46fa5a0",
+          "executed_at": "2026-10-27T10:22:17+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "conflict",
+      "verified_by": null,
+      "confidence": "low",
+      "decisive": true,
+      "note": "access log says 2600, export manifest says 0 | auditor model note: Retrieve the raw database query logs or change-data-capture records for the relevant timeframe to verify the actual number of records extracted. Alternatively, obtain the export tool's execution logs to confirm whether the manifest accurately reflects the completed transfer."
+    },
+    {
+      "id": "F05",
+      "claim": "data_unintelligible",
+      "statement": "Encryption at rest: none, key: none (readable if accessed)",
+      "value": {
+        "unintelligible": false,
+        "basis": "asset_register"
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T06_ASSET_SECURITY",
+          "tables": [
+            "assets"
+          ],
+          "row_ref": "SYS-WEB-FORMS",
+          "query_hash": "2a57c851dc0bf07b07b8",
+          "executed_at": "2026-10-27T10:22:17+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "zetaris",
+          "template_id": "T06_ASSET_SECURITY",
+          "tables": [
+            "assets"
+          ],
+          "row_ref": "SYS-WEB-FORMS",
+          "query_hash": "2a57c851dc0bf07b07b8",
+          "executed_at": "2026-10-27T10:22:18+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F06",
+      "claim": "mitigations",
+      "statement": "Updates recorded up to the assessment time: none",
+      "value": {
+        "codes": [],
+        "updates": []
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T02_INCIDENT_UPDATES",
+          "tables": [
+            "incident_updates"
+          ],
+          "row_ref": "none",
+          "query_hash": "244c977ac631893fb171",
+          "executed_at": "2026-10-27T10:22:17+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": false,
+      "note": ""
+    }
+  ],
+  "legal_basis": [
+    {
+      "article": "GDPR Art. 33(1)",
+      "why": "risk to rights and freedoms (severity high)"
+    },
+    {
+      "article": "GDPR Art. 34(1)",
+      "why": "likely high risk (severity high)"
+    },
+    {
+      "article": "GDPR Art. 33(5)",
+      "why": "every breach is documented internally"
+    },
+    {
+      "article": "GDPR Art. 33(4)",
+      "why": "information not yet complete: notify in phases"
+    }
+  ],
+  "draft_notification": {
+    "to_supervisory_authority": {
+      "a_nature": "misconfiguration: Contact form submissions found publicly listable; discovery date not recorded. Categories: email, message_text, name. Approximately 2600 data subjects and records (access log).",
+      "b_contact": "Data Protection Officer, iod@przykladowo.example (SYNTHETIC)",
+      "c_consequences": "Likely consequences: disclosure of the content of private messages; phishing targeting the data subjects.",
+      "d_measures": "Proposed: disable public listing, review access logs for downloads, rotate exposed secrets."
+    },
+    "missing": [],
+    "complete": true,
+    "to_data_subjects": {
+      "a_nature": "misconfiguration: Contact form submissions found publicly listable; discovery date not recorded. Categories: email, message_text, name. Approximately 2600 data subjects and records (access log).",
+      "b_contact": "Data Protection Officer, iod@przykladowo.example (SYNTHETIC)",
+      "c_consequences": "Likely consequences: disclosure of the content of private messages; phishing targeting the data subjects.",
+      "d_measures": "Proposed: disable public listing, review access logs for downloads, rotate exposed secrets.",
+      "language": "clear and plain language (Art. 34(2))"
+    },
+    "phased": "Initial notification; further information will follow without undue delay (Art. 33(4))."
+  },
+  "open_questions": [
+    "Resolve conflict in F04 (affected_count): access log says 2600, export manifest says 0 | auditor model note: Retrieve the raw database query logs or change-data-capture records for the relevant timeframe to verify the actual number of records extracted. Alternatively, obtain the export tool's execution logs to confirm whether the manifest accurately reflects the completed transfer."
+  ],
+  "clock": {
+    "aware_at": "2026-10-22T09:40:00+02:00",
+    "assumed": true,
+    "deadline": "2026-10-25T09:40:00+02:00",
+    "now": "2026-10-22T12:00:00+02:00",
+    "hours_left": 69.7
+  },
+  "limitations": [
+    "Decision support for a data protection officer, not legal advice.",
+    "All data is synthetic (see data/SYNTHETIC.md).",
+    "Severity follows the ENISA 2013 method; national supervisory authority practice may differ."
+  ],
+  "data_backends": [
+    "zetaris"
+  ],
+  "agents": [
+    "planner",
+    "investigator",
+    "evidence_auditor",
+    "risk_assessor",
+    "reviewer_drafter"
+  ],
+  "iterations": 1,
+  "vetoes": [],
+  "errors": [],
+  "llm_enabled": true,
+  "world_model": {
+    "namespace": "20261027T112214-63cf87",
+    "events": 20,
+    "entities": 4,
+    "relationships": 3,
+    "facts": 12,
+    "facts_superseded": 6,
+    "audit_entries": 20,
+    "file": "logs/.world/20261027T112214-63cf87.json"
+  },
+  "org_memory": {
+    "recalled": [],
+    "reverified": [],
+    "learned": [
+      "mem-7",
+      "mem-8"
+    ],
+    "ledger": {
+      "create": 8,
+      "read": 2,
+      "feedback": 2,
+      "promote": 2
+    },
+    "dir": "C:\\Users\\Marek\\AppData\\Local\\Temp\\breach72-hmem-_tyfy4un\\gmina-przykladowo-fictional-municipality"
+  },
+  "trace_id": "20261027T112214-63cf87",
+  "log_file": "logs/trace-20261027T112214-63cf87.jsonl",
+  "execution_time": 5.948
+}

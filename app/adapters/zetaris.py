@@ -26,6 +26,18 @@ from app.queries.templates import TEMPLATES, render_inline
 RECORDINGS = ROOT / "recordings"
 
 
+INT_COLS = {"bytes", "records_count", "case_no", "subjects_estimate", "breach_notice_hours"}
+
+
+def _coerce(col: str, value):
+    """Integer columns come back as strings from the platform; restore the source type."""
+    if col in INT_COLS and isinstance(value, str) and value.lstrip("-").isdigit():
+        return int(value)
+    if value in ("null", "NULL"):
+        return None
+    return value
+
+
 class ZetarisBackend:
     name = "zetaris"
 
@@ -39,6 +51,11 @@ class ZetarisBackend:
         self.record = record
         self.table_map = load_table_map("zetaris")
         self._open = opener or urllib.request.urlopen
+        self.proxy = None
+        if os.environ.get("ZETARIS_BASE_URL"):
+            from app.adapters.zetaris_proxy import ZetarisProxyClient
+            self.proxy = ZetarisProxyClient(opener=opener, timeout=self.timeout)
+            self.base_url = self.proxy.base_url
         if not self.base_url:
             raise SourceError("ZETARIS_REST_URL is not set (use SAMPLE_MODE=true to replay recordings)", False)
 
@@ -53,7 +70,12 @@ class ZetarisBackend:
 
     @staticmethod
     def _parse_response(payload: dict) -> tuple[list[str], list[dict]]:
-        # Accept {"columns": [...], "rows": [[...]]} or {"data": [{...}]}
+        # Accept {"headers": [...], "data": [[...]]} (local platform, values as strings),
+        # {"columns": [...], "rows": [[...]]} or {"data": [{...}]}
+        if "headers" in payload and isinstance(payload.get("data"), list):
+            cols = [c["name"] if isinstance(c, dict) else c for c in payload["headers"]]
+            rows = [dict(zip(cols, r)) if isinstance(r, list) else r for r in payload["data"]]
+            return cols, [{k: _coerce(k, v) for k, v in r.items()} for r in rows]
         if "columns" in payload and "rows" in payload:
             cols = [c["name"] if isinstance(c, dict) else c for c in payload["columns"]]
             return cols, [dict(zip(cols, r)) if isinstance(r, list) else r for r in payload["rows"]]
@@ -68,8 +90,11 @@ class ZetarisBackend:
         while attempt <= self.max_retries:
             t0 = time.perf_counter()
             try:
-                with self._open(self._build_request(sql), timeout=self.timeout) as resp:
-                    payload = json.loads(resp.read().decode("utf-8"))
+                if self.proxy is not None:
+                    payload = self.proxy.run(sql)
+                else:
+                    with self._open(self._build_request(sql), timeout=self.timeout) as resp:
+                        payload = json.loads(resp.read().decode("utf-8"))
                 cols, rows = self._parse_response(payload)
                 qh = query_hash(template_id, params)
                 res = QueryResult(template_id, params, cols, rows, self.name, list(TEMPLATES[template_id].tables),
@@ -78,6 +103,8 @@ class ZetarisBackend:
                 if self.record:
                     self._save(res, sql, payload)
                 return res
+            except SourceError as exc:
+                last = exc
             except urllib.error.HTTPError as exc:
                 last = SourceError(f"Zetaris HTTP {exc.code}", recoverable=exc.code >= 500 or exc.code == 429)
             except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:

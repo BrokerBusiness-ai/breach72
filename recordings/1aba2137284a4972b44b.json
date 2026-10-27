@@ -1,0 +1,34 @@
+{
+ "query_hash": "1aba2137284a4972b44b",
+ "template_id": "T05_ROPA_FOR_SYSTEM",
+ "params": {
+  "system_id": "SYS-HR-SRV"
+ },
+ "sql": "SELECT processing_id, name, data_categories, special_categories, subject_types, subjects_estimate, processor_id FROM ropa_db.ropa WHERE system_id = 'SYS-HR-SRV'",
+ "recorded_at": "2026-10-27T10:22:05+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "processing_id",
+   "name",
+   "data_categories",
+   "special_categories",
+   "subject_types",
+   "subjects_estimate",
+   "processor_id"
+  ],
+  "data": [
+   [
+    "PR-03",
+    "Personnel files",
+    "name;pesel;address;salary;sick_leave_certificates",
+    "yes",
+    "employees",
+    "310",
+    null
+   ]
+  ],
+  "total": 1,
+  "timeUsed": 156
+ }
+}

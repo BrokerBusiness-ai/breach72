@@ -1,0 +1,32 @@
+{
+ "query_hash": "0fdf936dbf9b2798a603",
+ "template_id": "T06_ASSET_SECURITY",
+ "params": {
+  "system_id": "SYS-HR-SRV"
+ },
+ "sql": "SELECT system_id, asset_type, encryption_at_rest, key_location, backup, backup_offline FROM asset_db.assets WHERE system_id = 'SYS-HR-SRV'",
+ "recorded_at": "2026-10-27T10:22:06+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "system_id",
+   "asset_type",
+   "encryption_at_rest",
+   "key_location",
+   "backup",
+   "backup_offline"
+  ],
+  "data": [
+   [
+    "SYS-HR-SRV",
+    "file_server",
+    "none",
+    "none",
+    "daily",
+    "yes"
+   ]
+  ],
+  "total": 1,
+  "timeUsed": 113
+ }
+}

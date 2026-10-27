@@ -1,0 +1,30 @@
+{
+ "query_hash": "20b50817be6ad73f54ff",
+ "template_id": "T07_PROCESSOR_CONTRACT",
+ "params": {
+  "processor_id": "PROC-01"
+ },
+ "sql": "SELECT processor_id, name, art28_contract_signed, breach_notice_hours, contract_ref FROM contracts_db.processor_contracts WHERE processor_id = 'PROC-01'",
+ "recorded_at": "2026-10-27T10:22:12+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "processor_id",
+   "name",
+   "art28_contract_signed",
+   "breach_notice_hours",
+   "contract_ref"
+  ],
+  "data": [
+   [
+    "PROC-01",
+    "Przykladowo Payroll Services (fictional)",
+    "yes",
+    "24",
+    "UP-2024-011"
+   ]
+  ],
+  "total": 1,
+  "timeUsed": 104
+ }
+}

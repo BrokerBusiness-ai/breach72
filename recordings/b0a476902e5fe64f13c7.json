@@ -1,0 +1,32 @@
+{
+ "query_hash": "b0a476902e5fe64f13c7",
+ "template_id": "T06_ASSET_SECURITY",
+ "params": {
+  "system_id": "SYS-PAYROLL-EXT"
+ },
+ "sql": "SELECT system_id, asset_type, encryption_at_rest, key_location, backup, backup_offline FROM asset_db.assets WHERE system_id = 'SYS-PAYROLL-EXT'",
+ "recorded_at": "2026-10-27T10:22:13+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "system_id",
+   "asset_type",
+   "encryption_at_rest",
+   "key_location",
+   "backup",
+   "backup_offline"
+  ],
+  "data": [
+   [
+    "SYS-PAYROLL-EXT",
+    "saas",
+    "provider_managed",
+    "provider",
+    "provider",
+    "unknown"
+   ]
+  ],
+  "total": 1,
+  "timeUsed": 127
+ }
+}

@@ -105,9 +105,18 @@ Borderline scores (for example case 08, SE 2.0) still escalate to the DPO in the
 
 ## Sponsor technology
 
-- **Zetaris**: the single governed SQL access point to the four source systems (incident PostgreSQL database,
-  ROPA, asset register and processor contracts). The Investigator queries in place through vetted templates; the
-  Auditor re-queries with a different template before approval. Responses are recorded for sample mode.
+- **Zetaris**: the single governed SQL access point to the four source systems (incident log, ROPA, asset
+  register and processor contracts), each a separate database registered as its own Zetaris datasource
+  (`incident_db`, `ropa_db`, `asset_db`, `contracts_db`). The Investigator queries in place through vetted
+  templates; the Auditor re-queries with a different template before approval, and cross-system questions are one
+  federated query. Responses are recorded for sample mode.
+  Live setup on the local platform: `python scripts/zetaris_sources.py` writes the four synthetic databases,
+  `docker run -d --name breach72-sources -e POSTGRES_USER=breach72 -e POSTGRES_PASSWORD=synthetic-only -v
+  "$PWD/docker/sources/init:/docker-entrypoint-initdb.d:ro" postgres:16-alpine` starts them,
+  `docker network connect zetaris_default breach72-sources` puts them next to the platform, and
+  `python scripts/zetaris_register.py` runs `CREATE DATASOURCE` and `REGISTER DATASOURCE TABLES` for each.
+  Breach72 then reaches Zetaris over the platform's UI route (`ZETARIS_BASE_URL`, `ZETARIS_ORG_ID`, account in
+  `.env`; `app/adapters/zetaris_proxy.py`).
 - **Meterless** (Python implementations of the Apache-2.0 reference architecture, engines `world-model` and
   `hmem`, commit `1742dec`; Markovian and Scout are not used):
   - *World Model* (`app/adapters/meterless_world.py`) is the shared case state. Every finding and every status
@@ -162,15 +171,22 @@ Borderline scores (for example case 08, SE 2.0) still escalate to the DPO in the
 - Development: the code was written with AI assistance (Anthropic Claude as a coding agent, Cursor). The author
   reviewed the rules and the legal mapping.
 
-## Status (26 October 2026)
+## Status (27 October 2026)
 
 Done and tested: five agents, rule set with tests on EDPB 01/2021 cases, six synthetic cases, JSONL trace,
 HTML report, HTTP API, Zetaris adapter with timeout (20 s), bounded retries, recording and replay, Meterless
 World Model and H-MEM, Nemotron catalogue check, recording, replay and the two-condition acceptance gate,
 `scripts/record_and_verify.py`, `scripts/submission_check.py`, `scripts/build_deck.py`. Live Nemotron calls
 verified on 23 October. Feature freeze: tag `feature-freeze-2026-10-24`; since then only documentation and fixes.
-Open: live Zetaris sources and recordings. Until they are committed the offline demo runs on the local
-SYNTHETIC SQLite backend and every output says so in `limitations`.
+
+27 October: live Zetaris. The local Zetaris platform runs in Docker (`verify.sh`: login and the query through
+ui, api, driver and Spark pass). The four SYNTHETIC source systems are four separate PostgreSQL databases, each
+registered as its own Zetaris datasource. `scripts/record_and_verify.py` ran all six cases live on Zetaris and
+Nemotron (34 recorded Zetaris responses in `recordings/`, results in `output_examples/zetaris_nemotron/`), then
+replayed them in SAMPLE_MODE with an empty environment: 6 of 6 cases match field by field
+(`docs/replay_check.json`). Fix found by that check: replayed evidence is labelled `zetaris-replay`, which changed
+the Nemotron prompt hash; the provenance URI is now normalised before hashing, so a replay finds the recording of
+the live call it came from.
 
 ## Cursor usage
 

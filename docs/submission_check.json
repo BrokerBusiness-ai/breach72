@@ -28,7 +28,7 @@
     {
       "check": "secret_scan",
       "status": "PASS",
-      "reason": "102 tracked text files clean"
+      "reason": "103 tracked text files clean"
     },
     {
       "check": "dash_scan",
@@ -37,8 +37,8 @@
     },
     {
       "check": "zetaris_recordings",
-      "status": "WARN",
-      "reason": "sample mode cannot replay until a live Zetaris run is recorded"
+      "status": "PASS",
+      "reason": "34 recorded Zetaris responses"
     },
     {
       "check": "recordings_clean",
@@ -53,7 +53,7 @@
     {
       "check": "output_examples",
       "status": "PASS",
-      "reason": "12 results in 2 folders, trace, 5 agents, synthetic"
+      "reason": "18 results in 3 folders, trace, 5 agents, synthetic"
     },
     {
       "check": "test_cases",
@@ -62,5 +62,5 @@
     }
   ],
   "fail": 0,
-  "warn": 1
+  "warn": 0
 }

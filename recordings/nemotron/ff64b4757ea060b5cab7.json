@@ -1,0 +1,44 @@
+{
+ "prompt_hash": "ff64b4757ea060b5cab7",
+ "backend": "nvidia-hosted-api",
+ "agent": "reviewer_drafter",
+ "size": "large",
+ "model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+ "recorded_at": "2026-10-27T10:22:03+00:00",
+ "system": "You explain a decision that has ALREADY been made by a deterministic GDPR rule. Write 3-5 sentences for a data protection officer. Cite finding ids like [F03] for every factual statement. Do not change, soften or question the decision.",
+ "user": "Decision: Document internally only (no notification) (provisional: document_internally). Severity 1.0 low.\nFindings:\n[WORLD MODEL CONTEXT incident:breach72:INC-2026-001]\n- F05 affected_count [verified] Up to 40 data subjects (ROPA estimate; no record count in the logs) <fact_af20b564cfcd98d0; evidence_auditor; breach72://zetaris/T05_ROPA_FOR_SYSTEM>\n- F06 availability [verified] Backup: daily, offline copy: yes -> availability impact 'none' <fact_8d7d44a8c7b18bd3; evidence_auditor; breach72://zetaris/T06_ASSET_SECURITY>\n- F01 aware_at [verified] Moment the controller became aware of the breach <fact_3a9c68cd76b34354; evidence_auditor; breach72://zetaris/T01_INCIDENT_CORE>\n- F02 data_categories [verified] Data categories in PR-01: email, name, work_documents <fact_9ddba8cf951be15a; evidence_auditor; breach72://zetaris/T05_ROPA_FOR_SYSTEM>\n- F03 data_unintelligible [verified] Encryption at rest: full_disk_aes256, key: separate_tpm_pin (unintelligible to a finder) <fact_017dd505a1f9612f; evidence_auditor; breach72://zetaris/T06_ASSET_SECURITY>\n- F04 disclosure [verified] Loss of control: device lost outside the premises <fact_7c295462b3eabb87; evidence_auditor; breach72://zetaris/T02_INCIDENT_UPDATES>\n- F07 mitigations [verified] Updates recorded up to the assessment time: REMOTE_WIPE_SENT <fact_bae301c080a5d637; evidence_auditor; breach72://zetaris/T02_INCIDENT_UPDATES>\n- related: system:breach72:SYS-LAPTOP-114 (system)\n[/WORLD MODEL CONTEXT]\nRule explanation:\nSeverity 1.0 (low) = DPC 2 x EI 0.25 + CB 0.5 (ENISA 2013) [F02][F03][F04].\nRule step: DPC base 2 for behavioural data.\nRule step: EI negligible: data unintelligible to the recipient (encryption/hashing, key safe).\nRule step: EI 0.25 (negligible ease of identification).\nRule step: CB +0.5 for confidentiality (unknown_recipients).\nGDPR Art. 33(1): breach unlikely to result in a risk (severity low).\nGDPR Art. 33(5): every breach is documented internally.",
+ "response": {
+  "id": "chatcmpl-868cffd0-943c-4d09-a1cc-14f689dea101",
+  "choices": [
+   {
+    "index": 0,
+    "message": {
+     "content": "The incident has been assessed with a severity of 1.0 (low), calculated as DPC 2 x EI 0.25 + CB 0.5 [F02][F03][F04]. Because the data was unintelligible to the recipient due to full disk AES-256 encryption with a separate TPM pin, the ease of identification is negligible [F03]. Under GDPR Art. 33(1), this breach is unlikely to result in a risk to data subjects [F03][F04]. Consequently, no supervisory authority notification is required, and the incident will be documented internally only [F05][F07].",
+     "role": "assistant"
+    },
+    "finish_reason": "stop",
+    "logprobs": null
+   }
+  ],
+  "created": 1793096522,
+  "model": "private/nvidia/nemotron-3.5-super-120b-a12b",
+  "service_tier": null,
+  "system_fingerprint": null,
+  "object": "chat.completion",
+  "usage": {
+   "prompt_tokens": 768,
+   "completion_tokens": 147,
+   "total_tokens": 915,
+   "prompt_tokens_details": {
+    "audio_tokens": null,
+    "cached_tokens": 0
+   },
+   "completion_tokens_details": {
+    "accepted_prediction_tokens": null,
+    "audio_tokens": null,
+    "reasoning_tokens": 0,
+    "rejected_prediction_tokens": null
+   }
+  }
+ }
+}

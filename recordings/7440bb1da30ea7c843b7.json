@@ -1,0 +1,24 @@
+{
+ "query_hash": "7440bb1da30ea7c843b7",
+ "template_id": "T03_TRANSFER_EVENTS",
+ "params": {
+  "incident_id": "INC-2026-001"
+ },
+ "sql": "SELECT log_id, ts, action, bytes, destination, records_count, attachment_encrypted FROM incident_db.access_logs WHERE incident_id = 'INC-2026-001' AND action IN ('export', 'email_send', 'outbound_transfer', 'directory_listing') ORDER BY ts",
+ "recorded_at": "2026-10-27T10:22:00+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "log_id",
+   "ts",
+   "action",
+   "bytes",
+   "destination",
+   "records_count",
+   "attachment_encrypted"
+  ],
+  "data": [],
+  "total": 0,
+  "timeUsed": 184
+ }
+}

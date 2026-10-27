@@ -1,0 +1,23 @@
+{
+ "query_hash": "200c0d201cf005b6eaf2",
+ "template_id": "T02_INCIDENT_UPDATES",
+ "params": {
+  "incident_id": "INC-2026-002",
+  "as_of": "2026-10-20T12:00:00+02:00"
+ },
+ "sql": "SELECT update_id, ts, source, code, detail FROM incident_db.incident_updates WHERE incident_id = 'INC-2026-002' AND ts <= '2026-10-20T12:00:00+02:00' ORDER BY ts",
+ "recorded_at": "2026-10-27T10:21:28+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "update_id",
+   "ts",
+   "source",
+   "code",
+   "detail"
+  ],
+  "data": [],
+  "total": 0,
+  "timeUsed": 148
+ }
+}

@@ -1,0 +1,32 @@
+{
+ "query_hash": "a562c0f5fb8bc2dbcfed",
+ "template_id": "T06_ASSET_SECURITY",
+ "params": {
+  "system_id": "SYS-LAPTOP-114"
+ },
+ "sql": "SELECT system_id, asset_type, encryption_at_rest, key_location, backup, backup_offline FROM asset_db.assets WHERE system_id = 'SYS-LAPTOP-114'",
+ "recorded_at": "2026-10-27T10:22:01+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "system_id",
+   "asset_type",
+   "encryption_at_rest",
+   "key_location",
+   "backup",
+   "backup_offline"
+  ],
+  "data": [
+   [
+    "SYS-LAPTOP-114",
+    "laptop",
+    "full_disk_aes256",
+    "separate_tpm_pin",
+    "daily",
+    "yes"
+   ]
+  ],
+  "total": 1,
+  "timeUsed": 151
+ }
+}

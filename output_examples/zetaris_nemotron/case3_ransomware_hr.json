@@ -1,0 +1,403 @@
+{
+  "run_id": "20261027T112203-131559",
+  "status": "ok",
+  "incident_id": "INC-2026-003",
+  "as_of": "2026-10-21T15:00:00+02:00",
+  "decision": "escalate_to_dpo",
+  "decision_text": "Escalate to the DPO for a human decision",
+  "provisional_decision": "notify_authority_and_individuals",
+  "notify_supervisory_authority": true,
+  "notify_data_subjects": true,
+  "escalation_reasons": [
+    "sources conflict on a decisive fact"
+  ],
+  "flags": [
+    "special_categories_art9",
+    "phased_notification"
+  ],
+  "risk": {
+    "score": 5.25,
+    "band": "very_high",
+    "components": {
+      "dpc": 4,
+      "ei_level": "maximum",
+      "ei": 1.0,
+      "confidentiality": 0.5,
+      "integrity": 0.0,
+      "availability": 0.25,
+      "malicious": 0.5
+    },
+    "method": "ENISA 2013",
+    "rule_inputs": {
+      "data_type": "sensitive",
+      "dpc_adjustments": [],
+      "identifiability": "maximum",
+      "unintelligible": false,
+      "confidentiality": "unknown_recipients",
+      "integrity": "none",
+      "availability": "recoverable_delay",
+      "malicious": true,
+      "mitigations": []
+    }
+  },
+  "explanation": [
+    "Severity 5.25 (very_high) = DPC 4 x EI 1.0 + CB 1.25 (ENISA 2013) [F02][F04][F03].",
+    "Rule step: DPC base 4 for sensitive data.",
+    "Rule step: EI 1.0 (maximum ease of identification).",
+    "Rule step: CB +0.5 for confidentiality (unknown_recipients).",
+    "Rule step: CB +0.25 for availability (recoverable_delay).",
+    "Rule step: CB +0.5 for malicious (malicious intent).",
+    "GDPR Art. 33(1): risk to rights and freedoms (severity very_high).",
+    "GDPR Art. 34(1): likely high risk (severity very_high).",
+    "GDPR Art. 33(5): every breach is documented internally.",
+    "GDPR Art. 9(1): special categories involved: aggravating factor.",
+    "GDPR Art. 33(4): information not yet complete: notify in phases.",
+    "Escalated to the DPO because: sources conflict on a decisive fact."
+  ],
+  "model_summary": "The incident has been escalated to the DPO for a human decision due to a conflict regarding whether data was disclosed outside the controller [F03]. The severity is assessed as 5.25 (very_high) based on the involvement of special categories of data, the lack of encryption rendering data intelligible if accessed, and the disclosure conflict [F02][F04][F03]. Under GDPR Art. 33(1) and Art. 34(1), this severity level indicates a risk to rights and freedoms and a likely high risk to data subjects [F02][F04][F03]. The provisional decision is to notify the supervisory authority and the affected individuals [F03].",
+  "findings": [
+    {
+      "id": "F01",
+      "claim": "aware_at",
+      "statement": "Moment the controller became aware of the breach",
+      "value": {
+        "aware_at": "2026-10-21T07:05:00+02:00",
+        "assumed": false
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T01_INCIDENT_CORE",
+          "tables": [
+            "incidents"
+          ],
+          "row_ref": "INC-2026-003",
+          "query_hash": "84032dce5fee0dd6da7f",
+          "executed_at": "2026-10-27T10:22:03+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F02",
+      "claim": "data_categories",
+      "statement": "Data categories in PR-03: address, name, pesel, salary, sick_leave_certificates; includes special categories",
+      "value": {
+        "categories": [
+          "address",
+          "name",
+          "pesel",
+          "salary",
+          "sick_leave_certificates"
+        ],
+        "special": true,
+        "processing_ids": [
+          "PR-03"
+        ],
+        "processor_ids": [],
+        "subjects_estimate": 310
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T05_ROPA_FOR_SYSTEM",
+          "tables": [
+            "ropa"
+          ],
+          "row_ref": "PR-03",
+          "query_hash": "1aba2137284a4972b44b",
+          "executed_at": "2026-10-27T10:22:05+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F03",
+      "claim": "disclosure",
+      "statement": "Data sent outside the controller: outbound_transfer to 198.51.100.23",
+      "value": {
+        "left_control": true,
+        "recipient": "unknown",
+        "destinations": [
+          "198.51.100.23"
+        ],
+        "actions": [
+          "outbound_transfer"
+        ],
+        "bytes": 2147483648
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T03_TRANSFER_EVENTS",
+          "tables": [
+            "access_logs"
+          ],
+          "row_ref": "LOG-0004",
+          "query_hash": "2361b459eae908dba091",
+          "executed_at": "2026-10-27T10:22:05+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "zetaris",
+          "template_id": "T02_INCIDENT_UPDATES",
+          "tables": [
+            "incident_updates"
+          ],
+          "row_ref": "UPD-004,UPD-005",
+          "query_hash": "f17073b3d94b7cbcaf29",
+          "executed_at": "2026-10-27T10:22:06+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "conflict",
+      "verified_by": null,
+      "confidence": "low",
+      "decisive": true,
+      "note": "access log shows outbound transfer of 2,147,483,648 bytes, IT report states no evidence of exfiltration | auditor model note: Packet capture (PCAP) or NetFlow records for 198.51.100.23 showing payload content and destination, plus destination-server inbound logs confirming receipt and storage of the transferred data."
+    },
+    {
+      "id": "F04",
+      "claim": "data_unintelligible",
+      "statement": "Encryption at rest: none, key: none (readable if accessed)",
+      "value": {
+        "unintelligible": false,
+        "basis": "asset_register"
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T06_ASSET_SECURITY",
+          "tables": [
+            "assets"
+          ],
+          "row_ref": "SYS-HR-SRV",
+          "query_hash": "0fdf936dbf9b2798a603",
+          "executed_at": "2026-10-27T10:22:06+00:00",
+          "recorded_at": null
+        },
+        {
+          "backend": "zetaris",
+          "template_id": "T06_ASSET_SECURITY",
+          "tables": [
+            "assets"
+          ],
+          "row_ref": "SYS-HR-SRV",
+          "query_hash": "0fdf936dbf9b2798a603",
+          "executed_at": "2026-10-27T10:22:06+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": ""
+    },
+    {
+      "id": "F05",
+      "claim": "affected_count",
+      "statement": "Up to 310 data subjects (ROPA estimate; no record count in the logs)",
+      "value": {
+        "subjects": 310,
+        "basis": "ropa_estimate"
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T05_ROPA_FOR_SYSTEM",
+          "tables": [
+            "ropa"
+          ],
+          "row_ref": "PR-03",
+          "query_hash": "1aba2137284a4972b44b",
+          "executed_at": "2026-10-27T10:22:05+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": true,
+      "note": "upper bound; estimate from ROPA, not a count"
+    },
+    {
+      "id": "F06",
+      "claim": "availability",
+      "statement": "Backup: daily, offline copy: yes -> availability impact 'recoverable_delay'",
+      "value": {
+        "level": "recoverable_delay"
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T06_ASSET_SECURITY",
+          "tables": [
+            "assets"
+          ],
+          "row_ref": "SYS-HR-SRV",
+          "query_hash": "0fdf936dbf9b2798a603",
+          "executed_at": "2026-10-27T10:22:06+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": false,
+      "note": ""
+    },
+    {
+      "id": "F07",
+      "claim": "mitigations",
+      "statement": "Updates recorded up to the assessment time: IT_REPORT_NO_EXFIL, BACKUP_RESTORE_STARTED",
+      "value": {
+        "codes": [
+          "IT_REPORT_NO_EXFIL",
+          "BACKUP_RESTORE_STARTED"
+        ],
+        "updates": [
+          {
+            "update_id": "UPD-004",
+            "ts": "2026-10-21T13:00:00+02:00",
+            "source": "it_report",
+            "code": "IT_REPORT_NO_EXFIL",
+            "detail": "Initial IT report: no evidence of data exfiltration."
+          },
+          {
+            "update_id": "UPD-005",
+            "ts": "2026-10-21T14:30:00+02:00",
+            "source": "it_report",
+            "code": "BACKUP_RESTORE_STARTED",
+            "detail": "Restore from offline backup started."
+          }
+        ]
+      },
+      "evidence": [
+        {
+          "backend": "zetaris",
+          "template_id": "T02_INCIDENT_UPDATES",
+          "tables": [
+            "incident_updates"
+          ],
+          "row_ref": "UPD-004,UPD-005",
+          "query_hash": "f17073b3d94b7cbcaf29",
+          "executed_at": "2026-10-27T10:22:06+00:00",
+          "recorded_at": null
+        }
+      ],
+      "status": "verified",
+      "verified_by": null,
+      "confidence": "single_source",
+      "decisive": false,
+      "note": ""
+    }
+  ],
+  "legal_basis": [
+    {
+      "article": "GDPR Art. 33(1)",
+      "why": "risk to rights and freedoms (severity very_high)"
+    },
+    {
+      "article": "GDPR Art. 34(1)",
+      "why": "likely high risk (severity very_high)"
+    },
+    {
+      "article": "GDPR Art. 33(5)",
+      "why": "every breach is documented internally"
+    },
+    {
+      "article": "GDPR Art. 9(1)",
+      "why": "special categories involved: aggravating factor"
+    },
+    {
+      "article": "GDPR Art. 33(4)",
+      "why": "information not yet complete: notify in phases"
+    }
+  ],
+  "draft_notification": {
+    "to_supervisory_authority": {
+      "a_nature": "ransomware: HR file server encrypted, ransom note found. Categories: address, name, pesel, salary, sick_leave_certificates. Approximately 310 data subjects and records (ropa estimate).",
+      "b_contact": "Data Protection Officer, iod@przykladowo.example (SYNTHETIC)",
+      "c_consequences": "Likely consequences: disclosure of financial situation; disclosure of health-related information; identity fraud using the national identification number.",
+      "d_measures": "Measures taken: initial IT forensic report obtained; restore from offline backup started. Proposed: isolate affected systems, restore from offline backup, complete forensic analysis of exfiltration."
+    },
+    "missing": [],
+    "complete": true,
+    "to_data_subjects": {
+      "a_nature": "ransomware: HR file server encrypted, ransom note found. Categories: address, name, pesel, salary, sick_leave_certificates. Approximately 310 data subjects and records (ropa estimate).",
+      "b_contact": "Data Protection Officer, iod@przykladowo.example (SYNTHETIC)",
+      "c_consequences": "Likely consequences: disclosure of financial situation; disclosure of health-related information; identity fraud using the national identification number.",
+      "d_measures": "Measures taken: initial IT forensic report obtained; restore from offline backup started. Proposed: isolate affected systems, restore from offline backup, complete forensic analysis of exfiltration.",
+      "language": "clear and plain language (Art. 34(2))"
+    },
+    "phased": "Initial notification; further information will follow without undue delay (Art. 33(4))."
+  },
+  "open_questions": [
+    "Resolve conflict in F03 (disclosure): access log shows outbound transfer of 2,147,483,648 bytes, IT report states no evidence of exfiltration | auditor model note: Packet capture (PCAP) or NetFlow records for 198.51.100.23 showing payload content and destination, plus destination-server inbound logs confirming receipt and storage of the transferred data."
+  ],
+  "clock": {
+    "aware_at": "2026-10-21T07:05:00+02:00",
+    "assumed": false,
+    "deadline": "2026-10-24T07:05:00+02:00",
+    "now": "2026-10-21T15:00:00+02:00",
+    "hours_left": 64.1
+  },
+  "limitations": [
+    "Decision support for a data protection officer, not legal advice.",
+    "All data is synthetic (see data/SYNTHETIC.md).",
+    "Severity follows the ENISA 2013 method; national supervisory authority practice may differ."
+  ],
+  "data_backends": [
+    "zetaris"
+  ],
+  "agents": [
+    "planner",
+    "investigator",
+    "evidence_auditor",
+    "risk_assessor",
+    "reviewer_drafter"
+  ],
+  "iterations": 1,
+  "vetoes": [],
+  "errors": [],
+  "llm_enabled": true,
+  "world_model": {
+    "namespace": "20261027T112203-131559",
+    "events": 20,
+    "entities": 3,
+    "relationships": 2,
+    "facts": 14,
+    "facts_superseded": 7,
+    "audit_entries": 20,
+    "file": "logs/.world/20261027T112203-131559.json"
+  },
+  "org_memory": {
+    "recalled": [],
+    "reverified": [],
+    "learned": [
+      "mem-5",
+      "mem-6"
+    ],
+    "ledger": {
+      "create": 6,
+      "read": 2,
+      "feedback": 2,
+      "promote": 2
+    },
+    "dir": "C:\\Users\\Marek\\AppData\\Local\\Temp\\breach72-hmem-_tyfy4un\\gmina-przykladowo-fictional-municipality"
+  },
+  "trace_id": "20261027T112203-131559",
+  "log_file": "logs/trace-20261027T112203-131559.jsonl",
+  "execution_time": 6.286
+}

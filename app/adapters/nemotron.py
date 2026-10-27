@@ -65,7 +65,9 @@ FALLBACKS = {
 
 
 _VOLATILE = [(re.compile(r"\bfact_[0-9a-f]{8,}\b"), "fact_*"),
-             (re.compile(r"\b\d{8}T\d{6}-[0-9a-f]{6}\b"), "<run_id>")]
+             (re.compile(r"\b\d{8}T\d{6}-[0-9a-f]{6}\b"), "<run_id>"),
+             # a replayed Zetaris answer is the same evidence as the live answer it was recorded from
+             (re.compile(r"breach72://zetaris-replay/"), "breach72://zetaris/")]
 
 
 def _stable(text: str) -> str:

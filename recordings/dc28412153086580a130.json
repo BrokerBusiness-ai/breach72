@@ -1,0 +1,38 @@
+{
+ "query_hash": "dc28412153086580a130",
+ "template_id": "T02_INCIDENT_UPDATES",
+ "params": {
+  "incident_id": "INC-2026-002",
+  "as_of": "2026-10-21T12:00:00+02:00"
+ },
+ "sql": "SELECT update_id, ts, source, code, detail FROM incident_db.incident_updates WHERE incident_id = 'INC-2026-002' AND ts <= '2026-10-21T12:00:00+02:00' ORDER BY ts",
+ "recorded_at": "2026-10-27T10:21:55+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "update_id",
+   "ts",
+   "source",
+   "code",
+   "detail"
+  ],
+  "data": [
+   [
+    "UPD-002",
+    "2026-10-20T16:40:00+02:00",
+    "case_officer",
+    "RECIPIENT_IDENTIFIED",
+    "Recipient identified as a private person; contact attempted."
+   ],
+   [
+    "UPD-003",
+    "2026-10-21T11:20:00+02:00",
+    "case_officer",
+    "RECIPIENT_DELETION_CONFIRMED",
+    "Recipient confirmed in writing that the file was deleted and not shared."
+   ]
+  ],
+  "total": 2,
+  "timeUsed": 214
+ }
+}

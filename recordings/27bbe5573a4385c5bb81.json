@@ -1,0 +1,36 @@
+{
+ "query_hash": "27bbe5573a4385c5bb81",
+ "template_id": "T01_INCIDENT_CORE",
+ "params": {
+  "incident_id": "INC-2026-005"
+ },
+ "sql": "SELECT incident_id, case_no, reported_at, aware_at, system_id, category, summary, reporter_role FROM incident_db.incidents WHERE incident_id = 'INC-2026-005'",
+ "recorded_at": "2026-10-27T10:22:14+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "incident_id",
+   "case_no",
+   "reported_at",
+   "aware_at",
+   "system_id",
+   "category",
+   "summary",
+   "reporter_role"
+  ],
+  "data": [
+   [
+    "INC-2026-005",
+    "5",
+    "2026-10-22T10:00:00+02:00",
+    null,
+    "SYS-WEB-FORMS",
+    "misconfiguration",
+    "Contact form submissions found publicly listable; discovery date not recorded.",
+    "citizen"
+   ]
+  ],
+  "total": 1,
+  "timeUsed": 134
+ }
+}

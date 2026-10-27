@@ -1,0 +1,36 @@
+{
+ "query_hash": "2fec2e5e789c7ebba9ce",
+ "template_id": "T01_INCIDENT_CORE",
+ "params": {
+  "incident_id": "INC-2026-001"
+ },
+ "sql": "SELECT incident_id, case_no, reported_at, aware_at, system_id, category, summary, reporter_role FROM incident_db.incidents WHERE incident_id = 'INC-2026-001'",
+ "recorded_at": "2026-10-27T10:21:57+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "incident_id",
+   "case_no",
+   "reported_at",
+   "aware_at",
+   "system_id",
+   "category",
+   "summary",
+   "reporter_role"
+  ],
+  "data": [
+   [
+    "INC-2026-001",
+    "1",
+    "2026-10-19T08:10:00+02:00",
+    "2026-10-19T08:30:00+02:00",
+    "SYS-LAPTOP-114",
+    "lost_device",
+    "Employee reports laptop left on a train.",
+    "employee"
+   ]
+  ],
+  "total": 1,
+  "timeUsed": 184
+ }
+}

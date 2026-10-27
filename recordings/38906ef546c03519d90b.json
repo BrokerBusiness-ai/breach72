@@ -1,0 +1,31 @@
+{
+ "query_hash": "38906ef546c03519d90b",
+ "template_id": "T02_INCIDENT_UPDATES",
+ "params": {
+  "incident_id": "INC-2026-001",
+  "as_of": "2026-10-19T12:00:00+02:00"
+ },
+ "sql": "SELECT update_id, ts, source, code, detail FROM incident_db.incident_updates WHERE incident_id = 'INC-2026-001' AND ts <= '2026-10-19T12:00:00+02:00' ORDER BY ts",
+ "recorded_at": "2026-10-27T10:22:01+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "update_id",
+   "ts",
+   "source",
+   "code",
+   "detail"
+  ],
+  "data": [
+   [
+    "UPD-001",
+    "2026-10-19T09:00:00+02:00",
+    "it_report",
+    "REMOTE_WIPE_SENT",
+    "Remote wipe command queued."
+   ]
+  ],
+  "total": 1,
+  "timeUsed": 145
+ }
+}

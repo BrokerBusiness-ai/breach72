@@ -1,0 +1,22 @@
+{
+ "query_hash": "15a6362a32186e31a13b",
+ "template_id": "T08_EXPORT_CATEGORIES",
+ "params": {
+  "incident_id": "INC-2026-002"
+ },
+ "sql": "SELECT DISTINCT data_categories FROM incident_db.export_items WHERE incident_id = 'INC-2026-002'",
+ "recorded_at": "2026-10-27T10:21:54+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "data_categories"
+  ],
+  "data": [
+   [
+    "name;pesel;address;benefit_type"
+   ]
+  ],
+  "total": 1,
+  "timeUsed": 225
+ }
+}

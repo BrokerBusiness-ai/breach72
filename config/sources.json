@@ -1,16 +1,21 @@
 {
-  "_comment": "Logical table -> physical name. 'dev' is the local SQLite backend; 'zetaris' must match the catalog created in Zetaris (verify after verify.sh).",
+  "_comment": "Logical table -> physical name. 'dev' is the local SQLite backend; 'zetaris' is the datasource.table name registered in Zetaris by scripts/zetaris_register.py (four separate source databases, one Zetaris datasource each).",
   "dev": {
-    "incidents": "incidents", "incident_updates": "incident_updates", "access_logs": "access_logs",
-    "export_items": "export_items", "ropa": "ropa", "assets": "assets", "processor_contracts": "processor_contracts"
+    "incidents": "incidents",
+    "incident_updates": "incident_updates",
+    "access_logs": "access_logs",
+    "export_items": "export_items",
+    "ropa": "ropa",
+    "assets": "assets",
+    "processor_contracts": "processor_contracts"
   },
   "zetaris": {
-    "incidents": "incident_db.public.incidents",
-    "incident_updates": "incident_db.public.incident_updates",
-    "access_logs": "incident_db.public.access_logs",
-    "export_items": "incident_db.public.export_items",
-    "ropa": "ropa_csv.default.ropa",
-    "assets": "asset_register_csv.default.assets",
-    "processor_contracts": "processor_contracts_csv.default.processor_contracts"
+    "incidents": "incident_db.incidents",
+    "incident_updates": "incident_db.incident_updates",
+    "access_logs": "incident_db.access_logs",
+    "export_items": "incident_db.export_items",
+    "ropa": "ropa_db.ropa",
+    "assets": "asset_db.assets",
+    "processor_contracts": "contracts_db.processor_contracts"
   }
 }

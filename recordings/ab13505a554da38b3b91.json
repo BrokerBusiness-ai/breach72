@@ -1,0 +1,32 @@
+{
+ "query_hash": "ab13505a554da38b3b91",
+ "template_id": "T06_ASSET_SECURITY",
+ "params": {
+  "system_id": "SYS-SOCIAL-REG"
+ },
+ "sql": "SELECT system_id, asset_type, encryption_at_rest, key_location, backup, backup_offline FROM asset_db.assets WHERE system_id = 'SYS-SOCIAL-REG'",
+ "recorded_at": "2026-10-27T10:21:56+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "system_id",
+   "asset_type",
+   "encryption_at_rest",
+   "key_location",
+   "backup",
+   "backup_offline"
+  ],
+  "data": [
+   [
+    "SYS-SOCIAL-REG",
+    "database",
+    "none",
+    "none",
+    "daily",
+    "yes"
+   ]
+  ],
+  "total": 1,
+  "timeUsed": 152
+ }
+}

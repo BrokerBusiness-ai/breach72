@@ -1,0 +1,34 @@
+{
+ "query_hash": "adce268a8a24cde808dc",
+ "template_id": "T05_ROPA_FOR_SYSTEM",
+ "params": {
+  "system_id": "SYS-SOCIAL-REG"
+ },
+ "sql": "SELECT processing_id, name, data_categories, special_categories, subject_types, subjects_estimate, processor_id FROM ropa_db.ropa WHERE system_id = 'SYS-SOCIAL-REG'",
+ "recorded_at": "2026-10-27T10:21:55+00:00",
+ "backend": "zetaris",
+ "response": {
+  "headers": [
+   "processing_id",
+   "name",
+   "data_categories",
+   "special_categories",
+   "subject_types",
+   "subjects_estimate",
+   "processor_id"
+  ],
+  "data": [
+   [
+    "PR-07",
+    "Social assistance beneficiaries register",
+    "name;pesel;address;benefit_type",
+    "no",
+    "beneficiaries",
+    "1450",
+    null
+   ]
+  ],
+  "total": 1,
+  "timeUsed": 128
+ }
+}

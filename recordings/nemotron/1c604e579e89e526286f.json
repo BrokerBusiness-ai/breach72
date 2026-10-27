@@ -1,0 +1,44 @@
+{
+ "prompt_hash": "1c604e579e89e526286f",
+ "backend": "nvidia-hosted-api",
+ "agent": "evidence_auditor",
+ "size": "large",
+ "model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+ "recorded_at": "2026-10-27T10:22:18+00:00",
+ "system": "You audit evidence in a GDPR breach investigation. Two sources disagree. In at most 2 sentences say which additional evidence would settle it. Do not decide the case.",
+ "user": "Claim: 2600 records left the system in the logged event(s). Conflict: access log says 2600, export manifest says 0",
+ "response": {
+  "id": "chatcmpl-348ae49d-e183-4836-a9a8-3648b2966f2c",
+  "choices": [
+   {
+    "index": 0,
+    "message": {
+     "content": "Retrieve the raw database query logs or change-data-capture records for the relevant timeframe to verify the actual number of records extracted. Alternatively, obtain the export tool's execution logs to confirm whether the manifest accurately reflects the completed transfer.",
+     "role": "assistant"
+    },
+    "finish_reason": "stop",
+    "logprobs": null
+   }
+  ],
+  "created": 1793096539,
+  "model": "private/nvidia/nemotron-3.5-super-120b-a12b",
+  "service_tier": null,
+  "system_fingerprint": null,
+  "object": "chat.completion",
+  "usage": {
+   "prompt_tokens": 83,
+   "completion_tokens": 48,
+   "total_tokens": 131,
+   "prompt_tokens_details": {
+    "audio_tokens": null,
+    "cached_tokens": 0
+   },
+   "completion_tokens_details": {
+    "accepted_prediction_tokens": null,
+    "audio_tokens": null,
+    "reasoning_tokens": 0,
+    "rejected_prediction_tokens": null
+   }
+  }
+ }
+}

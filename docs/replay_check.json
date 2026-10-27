@@ -1,0 +1,29 @@
+{
+  "cases": {
+    "case1_lost_encrypted_laptop": {
+      "match": true,
+      "diffs": []
+    },
+    "case2_misdirected_email": {
+      "match": true,
+      "diffs": []
+    },
+    "case2b_recipient_deleted": {
+      "match": true,
+      "diffs": []
+    },
+    "case3_ransomware_hr": {
+      "match": true,
+      "diffs": []
+    },
+    "case4_processor_late_notice": {
+      "match": true,
+      "diffs": []
+    },
+    "case5_no_detection_date": {
+      "match": true,
+      "diffs": []
+    }
+  },
+  "all_match": true
+}

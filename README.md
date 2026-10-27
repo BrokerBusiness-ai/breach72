@@ -38,7 +38,7 @@ Backends:
 | `replay` | default when `SAMPLE_MODE=true`: replays recorded live Zetaris responses; all agent logic runs for real | nothing |
 | `dev` | local SQLite over the synthetic CSVs, for development; every output says so in `limitations` | nothing |
 
-Offline demo from a clean clone with an empty `.env`: `python run.py --all --backend dev`. The data layer is the local SYNTHETIC SQLite store, and the Nemotron calls replay responses recorded from the live NVIDIA API (`recordings/nemotron/`); the rule set, the auditor's veto and re-verification and the drafting gates run for real. Until live Zetaris recordings are committed, the default `replay` backend stops with `source_unavailable` and points to this command instead of inventing data.
+Demo from a clean clone with an empty `.env`: `python run.py --all`. The default `replay` backend replays the 34 responses recorded from the live Zetaris run (`recordings/*.json`) and the Nemotron calls replay responses recorded from the live NVIDIA API (`recordings/nemotron/`); the rule set, the auditor's veto and re-verification and the drafting gates run for real. A query with no recording stops with `source_unavailable` instead of inventing data. `python run.py --all --backend dev` runs the same pipeline on the local SYNTHETIC SQLite store.
 
 HTTP API (standard library, no extra packages; binds to 127.0.0.1 by default):
 
@@ -57,9 +57,9 @@ python scripts/record_and_verify.py   # live run on Zetaris + Nemotron, then the
                                        # with an empty environment; writes docs/replay_check.json, exit 0 only on a full match
 ```
 
-Docker: `docker build -t breach72 . && docker run --rm breach72` runs the offline demo (all six cases on the
-`dev` backend, Nemotron replayed from recordings). A single case: `docker run --rm breach72
-input_examples/case3_ransomware_hr.json --backend dev`. The image contains no `.env`; pass live values with
+Docker: `docker build -t breach72 . && docker run --rm breach72` runs all six cases in SAMPLE_MODE
+(recorded live Zetaris and Nemotron responses). A single case: `docker run --rm breach72
+input_examples/case3_ransomware_hr.json`; the local SQLite store: add `--backend dev`. The image contains no `.env`; pass live values with
 `--env-file .env` to use `--backend zetaris`.
 
 Deck: `python scripts/build_deck.py` rebuilds `docs/Breach72_deck.pdf` (8 slides) from the repository state

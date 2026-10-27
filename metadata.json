@@ -28,7 +28,7 @@
     "small": "nvidia/nemotron-3.5-lightning-30b-a3b"
   },
   "entrypoint": "python run.py input_examples/case2_misdirected_email.json",
-  "sample_mode": "SAMPLE_MODE=true replays recorded live responses (Zetaris via the replay backend once recordings are committed; Nemotron from recordings/nemotron); no credentials needed",
+  "sample_mode": "SAMPLE_MODE=true replays recorded live responses (Zetaris via the replay backend from recordings/*.json; Nemotron from recordings/nemotron); no credentials needed",
   "data": "synthetic only, see data/SYNTHETIC.md",
   "demo_video": "docs/OAH2026-Archaios-ExplainWhy-Demo.mp4",
   "deck": "docs/Breach72_deck.pdf",

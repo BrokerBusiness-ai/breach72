@@ -8,4 +8,4 @@ ENV SAMPLE_MODE=true PYTHONUNBUFFERED=1
 RUN python data/generator.py && python -m pytest -q
 ENTRYPOINT ["python", "run.py"]
 # Default: offline demo, all six cases on the local SYNTHETIC backend, Nemotron replayed from recordings.
-CMD ["--all", "--backend", "dev"]
+CMD ["--all"]

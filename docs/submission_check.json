@@ -28,7 +28,7 @@
     {
       "check": "secret_scan",
       "status": "PASS",
-      "reason": "103 tracked text files clean"
+      "reason": "162 tracked text files clean"
     },
     {
       "check": "dash_scan",

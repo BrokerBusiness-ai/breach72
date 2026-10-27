@@ -74,7 +74,7 @@ def load_facts() -> dict:
         tests = int(m.group(1)) if m else None
     except Exception:
         pass
-    zetaris_rec = glob.glob(os.path.join(ROOT, "recordings", "zetaris", "*.json"))
+    zetaris_rec = glob.glob(os.path.join(ROOT, "recordings", "*.json"))  # app/adapters/zetaris.py RECORDINGS
     return {"meta": meta, "cases": cases, "calls": calls, "llm_errors": errors,
             "tests": tests, "zetaris_recordings": len(zetaris_rec)}
 
